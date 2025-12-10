@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples de Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <h1>Teste Simples de Login</h1>
+    
+    <button onclick="testarLogin()">TESTAR LOGIN</button>
+    
+    <div id="resultado"></div>
+
+    <script>
+        async function testarLogin() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = 'Testando...';
+            resultado.className = '';
+            
+            try {
+                console.log('Iniciando teste de login...');
+                
+                const url = '/api/auth.php?action=login';
+                console.log('URL:', url);
+                
+                const body = {
+                    email: 'admin@rodasbengalas.pt',
+                    password: 'admin123'
+                };
+                console.log('Body:', body);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(body)
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const text = await response.text();
+                console.log('Response text:', text);
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    resultado.innerHTML = 'ERRO: Resposta não é JSON válido\n\n' + text;
+                    resultado.className = 'error';
+                    return;
+                }
+                
+                if (data.success) {
+                    resultado.innerHTML = 'SUCCESS!\n\n' + JSON.stringify(data, null, 2);
+                    resultado.className = 'success';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 2000);
+                } else {
+                    resultado.innerHTML = 'ERRO:\n\n' + JSON.stringify(data, null, 2);
+                    resultado.className = 'error';
+                }
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                resultado.innerHTML = 'ERRO DE REDE:\n\n' + error.message + '\n\nStack:\n' + error.stack;
+                resultado.className = 'error';
+            }
+        }
+    </script>
+</body>
+</html>
