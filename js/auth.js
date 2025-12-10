@@ -22,13 +22,15 @@ const Auth = {
             await AuthAPI.logout();
             this.currentUser = null;
             localStorage.removeItem('user');
-            window.location.reload();
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
         } catch (error) {
             console.error('Logout error:', error);
             // Force logout even if API fails
             this.currentUser = null;
             localStorage.removeItem('user');
-            window.location.reload();
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
         }
     },
 
@@ -63,48 +65,30 @@ const Auth = {
     }
 };
 
-// Login Form Handler
+// Initialize auth on app.html
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const loginError = document.getElementById('loginError');
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                loginError.style.display = 'none';
-                const success = await Auth.login(email, password);
-                
-                if (success) {
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'flex';
+    const mainApp = document.getElementById('mainApp');
+    
+    // If we're on the app page, check authentication and initialize
+    if (mainApp) {
+        Auth.checkAuth().then(isAuthenticated => {
+            if (isAuthenticated) {
+                // Initialize the app if initApp function exists
+                if (typeof initApp === 'function') {
                     initApp();
                 }
-            } catch (error) {
-                loginError.textContent = error.message || 'Erro ao fazer login';
-                loginError.style.display = 'block';
+            } else {
+                // Redirect to login if not authenticated
+                window.location.href = 'login.html';
             }
         });
-    }
-
-    // Check if user is already logged in
-    Auth.checkAuth().then(isAuthenticated => {
-        if (isAuthenticated) {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'flex';
-            initApp();
+        
+        // Logout button handler
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                Auth.logout();
+            });
         }
-    });
-
-    // Logout button
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            Auth.logout();
-        });
     }
 });
