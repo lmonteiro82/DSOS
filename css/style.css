@@ -790,3 +790,43 @@ tr:hover {
         grid-template-columns: 1fr;
     }
 }
+/* Close Button improvements */
+.close-btn,
+.modal-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--gray-600);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    padding: 0;
+}
+
+/* Render an × only if the element is empty (no SVG/text inside) */
+.close-btn:empty::before,
+.modal-close:empty::before {
+    content: '×';
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 600;
+    color: currentColor;
+}
+
+/* If an SVG is present, prefer it and hide the generated × */
+.close-btn svg,
+.modal-close svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+.close-btn:hover,
+.modal-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-800);
+}

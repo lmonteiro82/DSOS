@@ -1,4 +1,7 @@
 // Lares Page
+function sanitizePhone(value) {
+    return (value || '').replace(/[^0-9+\s]/g, '').slice(0, 16);
+}
 async function loadLares() {
     const pageContent = document.getElementById('pageContent');
     
@@ -52,14 +55,12 @@ async function loadLares() {
                         <td>${lar.capacidade}</td>
                         <td>
                             ${Auth.isAdminGeral() ? `
-                                <button class="btn btn-sm btn-outline" onclick='showEditLarModal(${JSON.stringify(lar)})'>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    Editar
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteLar(${lar.id})">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                                    Eliminar
-                                </button>
+                                <button class="btn btn-sm btn-outline btn-edit-lar" data-lar='${JSON.stringify(lar)}'>Editar</button>
+                                <form method="POST" action="api/lares.php" style="display:inline;" onsubmit="return confirm('Tem a certeza que deseja eliminar ${lar.nome.replace(/'/g, "\\'")}'?');">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="id" value="${lar.id}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                </form>
                             ` : '-'}
                         </td>
                     </tr>
@@ -75,8 +76,15 @@ async function loadLares() {
 
         html += '</div>';
         pageContent.innerHTML = html;
+        
+        // Attach edit button handlers
+        document.querySelectorAll('.btn-edit-lar').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lar = JSON.parse(btn.getAttribute('data-lar'));
+                showEditLarModal(lar);
+            });
+        });
     } catch (error) {
-        console.error('Error loading lares:', error);
         showToast('Erro ao carregar lares', 'error');
     }
 }
@@ -94,7 +102,7 @@ function showCreateLarModal() {
             </div>
             <div class="form-group">
                 <label for="larTelefone">Telefone *</label>
-                <input type="tel" id="larTelefone" required>
+                <input type="tel" id="larTelefone" required inputmode="numeric" pattern="[0-9+\s]*" maxlength="16" oninput="this.value=this.value.replace(/[^0-9+\s]/g,'')">
             </div>
             <div class="form-group">
                 <label for="larEmail">Email *</label>
@@ -119,7 +127,7 @@ async function createLar() {
     const data = {
         nome: document.getElementById('larNome').value,
         morada: document.getElementById('larMorada').value,
-        telefone: document.getElementById('larTelefone').value,
+        telefone: sanitizePhone(document.getElementById('larTelefone').value),
         email: document.getElementById('larEmail').value,
         capacidade: parseInt(document.getElementById('larCapacidade').value)
     };
@@ -148,7 +156,7 @@ function showEditLarModal(lar) {
             </div>
             <div class="form-group">
                 <label for="larTelefone">Telefone *</label>
-                <input type="tel" id="larTelefone" value="${lar.telefone}" required>
+                <input type="tel" id="larTelefone" value="${lar.telefone}" required inputmode="numeric" pattern="[0-9+\s]*" maxlength="16" oninput="this.value=this.value.replace(/[^0-9+\s]/g,'')">
             </div>
             <div class="form-group">
                 <label for="larEmail">Email *</label>
@@ -174,7 +182,7 @@ async function updateLar() {
         id: parseInt(document.getElementById('larId').value),
         nome: document.getElementById('larNome').value,
         morada: document.getElementById('larMorada').value,
-        telefone: document.getElementById('larTelefone').value,
+        telefone: sanitizePhone(document.getElementById('larTelefone').value),
         email: document.getElementById('larEmail').value,
         capacidade: parseInt(document.getElementById('larCapacidade').value)
     };

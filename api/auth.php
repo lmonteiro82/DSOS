@@ -57,6 +57,7 @@ if ($method === 'POST' && ($action === 'login' || strpos($request_uri, '/login')
             // Guardar token na sessão ou base de dados
             session_start();
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['nome'] = $user['nome'];
             $_SESSION['token'] = $token;
 
             unset($user['password']);

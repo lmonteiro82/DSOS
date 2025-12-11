@@ -19,6 +19,11 @@ $db = $database->connect();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Handle _method override for forms
+if ($method === 'POST' && isset($_POST['_method'])) {
+    $method = $_POST['_method'];
+}
+
 // GET - Listar utentes
 if ($method === 'GET') {
     try {
@@ -54,6 +59,11 @@ if ($method === 'GET') {
 // POST - Criar utente
 else if ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"));
+    // Sanitize emergency contact phone
+    if (isset($data->contacto_emergencia_telefone)) {
+        $data->contacto_emergencia_telefone = preg_replace('/[^0-9+\s]/', '', $data->contacto_emergencia_telefone);
+        $data->contacto_emergencia_telefone = substr($data->contacto_emergencia_telefone, 0, 16);
+    }
 
     try {
         // Verificar se número de utente já existe
@@ -100,6 +110,11 @@ else if ($method === 'POST') {
 // PUT - Atualizar utente
 else if ($method === 'PUT') {
     $data = json_decode(file_get_contents("php://input"));
+    // Sanitize emergency contact phone
+    if (isset($data->contacto_emergencia_telefone)) {
+        $data->contacto_emergencia_telefone = preg_replace('/[^0-9+\s]/', '', $data->contacto_emergencia_telefone);
+        $data->contacto_emergencia_telefone = substr($data->contacto_emergencia_telefone, 0, 16);
+    }
 
     try {
         $query = "UPDATE utentes SET nome = :nome, data_nascimento = :data_nascimento, 
@@ -128,14 +143,25 @@ else if ($method === 'PUT') {
 
 // DELETE - Desativar utente
 else if ($method === 'DELETE') {
-    parse_str(file_get_contents("php://input"), $data);
+    // Support both JSON and form data
+    if (isset($_POST['id'])) {
+        $id = $_POST['id'];
+    } else {
+        parse_str(file_get_contents("php://input"), $data);
+        $id = $data['id'] ?? null;
+    }
     
     try {
         $query = "UPDATE utentes SET ativo = 0 WHERE id = :id";
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $data['id']);
+        $stmt->bindParam(':id', $id);
 
         if ($stmt->execute()) {
+            // If form submission, redirect back
+            if (isset($_POST['id'])) {
+                header('Location: ../app.html#utentes');
+                exit();
+            }
             echo json_encode(['success' => true, 'message' => 'Utente desativado com sucesso']);
         }
     } catch (PDOException $e) {

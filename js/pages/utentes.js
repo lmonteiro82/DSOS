@@ -1,6 +1,11 @@
 // Utentes Page
 let laresData = [];
 
+// Helpers
+function sanitizePhone(value) {
+    return (value || '').replace(/[^0-9+\s]/g, '').slice(0, 16);
+}
+
 async function loadUtentes() {
     const pageContent = document.getElementById('pageContent');
     
@@ -51,11 +56,15 @@ async function loadUtentes() {
                         <td>${utente.numero_utente}</td>
                         <td>${calculateAge(utente.data_nascimento)} anos</td>
                         <td>${utente.lar_nome}</td>
-                        <td>${utente.contacto_emergencia_nome || '-'}<br><small>${utente.contacto_emergencia_telefone || ''}</small></td>
+                        <td>${utente.contacto_emergencia_nome || '-'}<br><small>${sanitizePhone(utente.contacto_emergencia_telefone || '')}</small></td>
                         <td>
                             ${Auth.isAdmin() ? `
-                                <button class="btn btn-sm btn-outline" onclick='showEditUtenteModal(${JSON.stringify(utente).replace(/'/g, "&apos;")})'>Editar</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteUtente(${utente.id})">Eliminar</button>
+                                <button class="btn btn-sm btn-outline btn-edit-utente" data-utente='${JSON.stringify(utente)}'>Editar</button>
+                                <form method="POST" action="api/utentes.php" style="display:inline;" onsubmit="return confirm('Tem a certeza que deseja eliminar ${utente.nome.replace(/'/g, "\\'")}?');">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="id" value="${utente.id}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                </form>
                             ` : '-'}
                         </td>
                     </tr>
@@ -67,6 +76,14 @@ async function loadUtentes() {
 
         html += '</div>';
         pageContent.innerHTML = html;
+        
+        // Attach edit button handlers
+        document.querySelectorAll('.btn-edit-utente').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const utente = JSON.parse(btn.getAttribute('data-utente'));
+                showEditUtenteModal(utente);
+            });
+        });
     } catch (error) {
         showToast('Erro ao carregar utentes', 'error');
     }
@@ -99,7 +116,7 @@ function showCreateUtenteModal() {
             </div>
             <div class="form-group">
                 <label>Telefone Contacto Emergência</label>
-                <input type="tel" id="utenteContactoTelefone">
+                <input type="tel" id="utenteContactoTelefone" inputmode="numeric" pattern="[0-9+\s]*" maxlength="16" oninput="this.value=this.value.replace(/[^0-9+\s]/g,'')">
             </div>
             <div class="form-group">
                 <label>Relação</label>
@@ -127,7 +144,7 @@ async function createUtente() {
         numero_utente: document.getElementById('utenteNumero').value,
         lar_id: parseInt(document.getElementById('utenteLar').value),
         contacto_emergencia_nome: document.getElementById('utenteContactoNome').value,
-        contacto_emergencia_telefone: document.getElementById('utenteContactoTelefone').value,
+        contacto_emergencia_telefone: sanitizePhone(document.getElementById('utenteContactoTelefone').value),
         contacto_emergencia_relacao: document.getElementById('utenteContactoRelacao').value,
         observacoes: document.getElementById('utenteObservacoes').value
     };
@@ -160,7 +177,7 @@ function showEditUtenteModal(utente) {
             </div>
             <div class="form-group">
                 <label>Telefone</label>
-                <input type="tel" id="utenteContactoTelefone" value="${utente.contacto_emergencia_telefone || ''}">
+                <input type="tel" id="utenteContactoTelefone" inputmode="numeric" pattern="[0-9+\s]*" maxlength="16" oninput="this.value=this.value.replace(/[^0-9+\s]/g,'')" value="${utente.contacto_emergencia_telefone || ''}">
             </div>
             <div class="form-group">
                 <label>Relação</label>
@@ -187,7 +204,7 @@ async function updateUtente() {
         nome: document.getElementById('utenteNome').value,
         data_nascimento: document.getElementById('utenteDataNascimento').value,
         contacto_emergencia_nome: document.getElementById('utenteContactoNome').value,
-        contacto_emergencia_telefone: document.getElementById('utenteContactoTelefone').value,
+        contacto_emergencia_telefone: sanitizePhone(document.getElementById('utenteContactoTelefone').value),
         contacto_emergencia_relacao: document.getElementById('utenteContactoRelacao').value,
         observacoes: document.getElementById('utenteObservacoes').value
     };

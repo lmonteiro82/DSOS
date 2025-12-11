@@ -18,8 +18,8 @@ async function loadStocks() {
         let html = `
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Stocks</h1>
-                    <p class="page-subtitle">Gestão de stocks de medicamentos</p>
+                    <h1 class="page-title">Administrações</h1>
+                    <p class="page-subtitle">Contagem de administrações de medicamentos</p>
                 </div>
                 <button class="btn btn-primary" onclick="showAddStockModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -30,7 +30,7 @@ async function loadStocks() {
             <!-- Stock Geral -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Stock Geral por Medicamento</h3>
+                    <h3 class="card-title">Stock por Medicamento</h3>
                 </div>
                 <div class="table-container">
                     <table>
@@ -40,7 +40,7 @@ async function loadStocks() {
                                 <th>Dose</th>
                                 <th>Toma</th>
                                 ${Auth.isAdminGeral() ? '<th>Lar</th>' : ''}
-                                <th>Quantidade Total</th>
+                                <th>Quantidade em Stock</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,7 +56,7 @@ async function loadStocks() {
                         <td>${stock.dose}</td>
                         <td>${getBadge(getTipoTomaLabel(stock.toma), 'info')}</td>
                         ${Auth.isAdminGeral() ? `<td>${stock.lar_nome || '-'}</td>` : ''}
-                        <td><span class="badge badge-${stock.quantidade_total > 50 ? 'success' : stock.quantidade_total > 20 ? 'warning' : 'danger'}">${stock.quantidade_total}</span></td>
+                        <td><span class="badge badge-success">${stock.quantidade_total}</span></td>
                     </tr>
                 `;
             });
@@ -71,7 +71,7 @@ async function loadStocks() {
             <!-- Stock por Utente -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Stock por Utente</h3>
+                    <h3 class="card-title">Administrações por Utente</h3>
                 </div>
                 <div class="table-container">
                     <table>
@@ -79,32 +79,21 @@ async function loadStocks() {
                             <tr>
                                 <th>Utente</th>
                                 <th>Medicamento</th>
-                                <th>Quantidade</th>
-                                <th>Mínimo</th>
-                                <th>Lote</th>
-                                <th>Validade</th>
-                                <th>Ações</th>
+                                <th>Total Administrações</th>
                             </tr>
                         </thead>
                         <tbody>
         `;
 
         if (stocks.length === 0) {
-            html += '<tr><td colspan="7" style="text-align: center; padding: 40px;">Nenhum stock disponível</td></tr>';
+            html += '<tr><td colspan="3" style="text-align: center; padding: 40px;">Nenhum stock disponível</td></tr>';
         } else {
             stocks.forEach(stock => {
-                const baixo = stock.quantidade < stock.quantidade_minima;
                 html += `
                     <tr>
                         <td><strong>${stock.utente_nome}</strong></td>
                         <td>${stock.medicamento_nome}<br><small>${stock.dose} - ${getTipoTomaLabel(stock.toma)}</small></td>
-                        <td><span class="badge badge-${baixo ? 'danger' : 'success'}">${stock.quantidade}</span></td>
-                        <td>${stock.quantidade_minima}</td>
-                        <td>${stock.lote || '-'}</td>
-                        <td>${formatDate(stock.data_validade)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline" onclick='showEditStockModal(${JSON.stringify(stock).replace(/'/g, "&apos;")})'>Editar</button>
-                        </td>
+                        <td><span class="badge badge-success">${stock.quantidade}</span></td>
                     </tr>
                 `;
             });

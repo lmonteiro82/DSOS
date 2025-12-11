@@ -4,15 +4,28 @@ const API_BASE_URL = window.location.origin + '/api';
 // API Helper
 const API = {
     async request(endpoint, options = {}) {
-        const url = `${API_BASE_URL}/${endpoint}`;
+        // Add timestamp to prevent caching
+        const separator = endpoint.includes('?') ? '&' : '?';
+        const url = `${API_BASE_URL}/${endpoint}${separator}_t=${Date.now()}`;
         
-        const config = {
-            ...options,
+        const defaultOptions = {
             headers: {
                 'Content-Type': 'application/json',
-                ...options.headers
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             },
-            credentials: 'include'
+            credentials: 'include',
+            cache: 'no-store'
+        };
+
+        const config = {
+            ...defaultOptions,
+            ...options,
+            headers: {
+                ...defaultOptions.headers,
+                ...options.headers
+            }
         };
 
         try {

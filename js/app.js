@@ -4,7 +4,27 @@ let currentPage = 'dashboard';
 function initApp() {
     updateUserInfo();
     setupNavigation();
-    loadPage('dashboard');
+    
+    // Check if there's a hash in the URL
+    const hash = window.location.hash.substring(1); // Remove the #
+    // Remove query parameters from hash if present (e.g., #utentes?success=updated)
+    const page = (hash.split('?')[0]) || 'dashboard';
+    
+    console.log('initApp - Full URL:', window.location.href);
+    console.log('initApp - Hash:', hash);
+    console.log('initApp - Page to load:', page);
+    
+    // Update active nav item
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(nav => {
+        if (nav.getAttribute('data-page') === page) {
+            nav.classList.add('active');
+        } else {
+            nav.classList.remove('active');
+        }
+    });
+    
+    loadPage(page);
 }
 
 function updateUserInfo() {
@@ -28,23 +48,57 @@ function setupNavigation() {
     
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
             const page = item.getAttribute('data-page');
+            
+            // Only handle navigation for items with data-page attribute
+            // Let other links (like stocks.php) navigate normally
+            if (!page) {
+                return;
+            }
+            
+            e.preventDefault();
             
             // Update active state
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
             
+            // Update URL hash
+            window.location.hash = page;
+            
             // Load page
             loadPage(page);
         });
     });
+    
+    // Listen for hash changes (e.g., browser back/forward)
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash.substring(1);
+        // Remove query parameters from hash if present
+        const page = (hash.split('?')[0]) || 'dashboard';
+        
+        // Update active nav item
+        navItems.forEach(nav => {
+            if (nav.getAttribute('data-page') === page) {
+                nav.classList.add('active');
+            } else {
+                nav.classList.remove('active');
+            }
+        });
+        
+        loadPage(page);
+    });
 }
 
 async function loadPage(page) {
+    console.log('loadPage called with:', page);
     currentPage = page;
     const pageContent = document.getElementById('pageContent');
+    
+    // Redirect to stocks.php if trying to load stocks
+    if (page === 'stocks') {
+        window.location.href = 'stocks.php';
+        return;
+    }
     
     pageContent.innerHTML = showLoading();
 
@@ -65,15 +119,35 @@ async function loadPage(page) {
             case 'terapeuticas':
                 await loadTerapeuticas();
                 break;
-            case 'stocks':
-                await loadStocks();
-                break;
             case 'administracoes':
                 await loadAdministracoes();
                 break;
             default:
                 pageContent.innerHTML = '<h1>Página não encontrada</h1>';
         }
+        
+        // GLOBAL: Remove all onclick attributes and attach proper handlers
+        setTimeout(() => {
+            document.querySelectorAll('[onclick]').forEach(el => {
+                const onclickAttr = el.getAttribute('onclick');
+                console.warn('Found onclick on:', el, 'Value:', onclickAttr);
+                
+                // Extract function name and try to attach properly
+                if (onclickAttr) {
+                    try {
+                        // Create a proper event listener from the onclick string
+                        const handler = new Function('event', onclickAttr);
+                        el.addEventListener('click', handler);
+                        console.log('Attached handler for:', onclickAttr.substring(0, 50));
+                    } catch (e) {
+                        console.error('Failed to convert onclick:', e);
+                    }
+                }
+                
+                // Remove the onclick attribute
+                el.removeAttribute('onclick');
+            });
+        }, 100);
     } catch (error) {
         console.error('Error loading page:', error);
         pageContent.innerHTML = `

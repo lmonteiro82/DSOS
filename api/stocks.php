@@ -49,52 +49,58 @@ if ($method === 'GET') {
             $stmt = $db->prepare($query);
             $stmt->bindParam(':utente_id', $utente_id);
         }
-        // Stock geral do lar
+        // Stock geral do lar - mostra quantidade em stock
         else if (strpos($request_uri, '/geral') !== false) {
             if ($user['role'] === 'admin_geral') {
                 $query = "SELECT m.id as medicamento_id, m.nome as medicamento_nome, 
                           m.dose, m.toma, l.nome as lar_nome,
-                          SUM(s.quantidade) as quantidade_total
-                          FROM stocks s
-                          JOIN medicamentos m ON s.medicamento_id = m.id
-                          JOIN utentes u ON s.utente_id = u.id
-                          JOIN lares l ON u.lar_id = l.id
+                          COALESCE(SUM(s.quantidade), 0) as quantidade_total
+                          FROM medicamentos m
+                          JOIN lares l ON m.lar_id = l.id
+                          LEFT JOIN stocks s ON s.medicamento_id = m.id
+                          WHERE m.ativo = 1
                           GROUP BY m.id, l.id
                           ORDER BY l.nome, m.nome";
                 $stmt = $db->prepare($query);
             } else {
                 $query = "SELECT m.id as medicamento_id, m.nome as medicamento_nome, 
                           m.dose, m.toma,
-                          SUM(s.quantidade) as quantidade_total,
-                          GROUP_CONCAT(CONCAT(u.nome, ': ', s.quantidade) SEPARATOR ', ') as detalhes
-                          FROM stocks s
-                          JOIN medicamentos m ON s.medicamento_id = m.id
-                          JOIN utentes u ON s.utente_id = u.id
-                          WHERE u.lar_id = :lar_id
+                          COALESCE(SUM(s.quantidade), 0) as quantidade_total
+                          FROM medicamentos m
+                          LEFT JOIN stocks s ON s.medicamento_id = m.id
+                          WHERE m.ativo = 1 AND m.lar_id = :lar_id
                           GROUP BY m.id
                           ORDER BY m.nome";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':lar_id', $user['lar_id']);
             }
         }
-        // Todos os stocks
+        // Todos os stocks - conta administrações validadas por utente e medicamento
         else {
             if ($user['role'] === 'admin_geral') {
-                $query = "SELECT s.*, m.nome as medicamento_nome, m.dose, m.toma, 
-                          u.nome as utente_nome, l.nome as lar_nome
-                          FROM stocks s
-                          JOIN medicamentos m ON s.medicamento_id = m.id
-                          JOIN utentes u ON s.utente_id = u.id
+                $query = "SELECT u.id as utente_id, u.nome as utente_nome, 
+                          m.id as medicamento_id, m.nome as medicamento_nome, m.dose, m.toma,
+                          l.nome as lar_nome,
+                          COUNT(CASE WHEN a.validada = 1 AND a.administrada = 1 THEN 1 END) as quantidade
+                          FROM utentes u
+                          CROSS JOIN medicamentos m
                           JOIN lares l ON u.lar_id = l.id
+                          LEFT JOIN terapeuticas t ON t.utente_id = u.id AND t.medicamento_id = m.id
+                          LEFT JOIN administracoes a ON a.terapeutica_id = t.id
+                          WHERE u.ativo = 1 AND m.ativo = 1
+                          GROUP BY u.id, m.id, l.id
                           ORDER BY l.nome, u.nome, m.nome";
                 $stmt = $db->prepare($query);
             } else {
-                $query = "SELECT s.*, m.nome as medicamento_nome, m.dose, m.toma, 
-                          u.nome as utente_nome
-                          FROM stocks s
-                          JOIN medicamentos m ON s.medicamento_id = m.id
-                          JOIN utentes u ON s.utente_id = u.id
-                          WHERE u.lar_id = :lar_id
+                $query = "SELECT u.id as utente_id, u.nome as utente_nome,
+                          m.id as medicamento_id, m.nome as medicamento_nome, m.dose, m.toma,
+                          COUNT(CASE WHEN a.validada = 1 AND a.administrada = 1 THEN 1 END) as quantidade
+                          FROM utentes u
+                          CROSS JOIN medicamentos m
+                          LEFT JOIN terapeuticas t ON t.utente_id = u.id AND t.medicamento_id = m.id
+                          LEFT JOIN administracoes a ON a.terapeutica_id = t.id
+                          WHERE u.ativo = 1 AND m.ativo = 1 AND u.lar_id = :lar_id AND m.lar_id = :lar_id
+                          GROUP BY u.id, m.id
                           ORDER BY u.nome, m.nome";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':lar_id', $user['lar_id']);

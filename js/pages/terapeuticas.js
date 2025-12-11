@@ -65,8 +65,12 @@ async function loadTerapeuticas() {
                         <td>${ter.data_fim ? formatDate(ter.data_fim) : '-'}</td>
                         <td><small>${horarios}</small></td>
                         <td>
-                            <button class="btn btn-sm btn-outline" onclick='showEditTerapeuticaModal(${JSON.stringify(ter).replace(/'/g, "&apos;")})'>Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteTerapeutica(${ter.id})">Eliminar</button>
+                            <button class="btn btn-sm btn-outline btn-edit-ter" data-ter='${JSON.stringify(ter)}'>Editar</button>
+                            <form method="POST" action="api/terapeuticas.php" style="display:inline;" onsubmit="return confirm('Tem a certeza que deseja eliminar esta terap\u00eautica?');">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="id" value="${ter.id}">
+                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                 `;
@@ -77,6 +81,14 @@ async function loadTerapeuticas() {
 
         html += '</div>';
         pageContent.innerHTML = html;
+        
+        // Attach edit button handlers
+        document.querySelectorAll('.btn-edit-ter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const ter = JSON.parse(btn.getAttribute('data-ter'));
+                showEditTerapeuticaModal(ter);
+            });
+        });
     } catch (error) {
         showToast('Erro ao carregar terapêuticas', 'error');
     }

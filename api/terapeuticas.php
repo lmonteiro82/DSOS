@@ -19,6 +19,12 @@ $db = $database->connect();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+
+# Handle _method override for forms
+if ($method === 'POST' && isset($_POST['_method'])) {
+    $method = $_POST['_method'];
+}
+
 // GET - Listar terapêuticas
 if ($method === 'GET') {
     try {
@@ -147,14 +153,25 @@ else if ($method === 'PUT') {
 
 // DELETE - Desativar terapêutica
 else if ($method === 'DELETE') {
-    parse_str(file_get_contents("php://input"), $data);
+    // Support both JSON and form data
+    if (isset($_POST['id'])) {
+        $id = $_POST['id'];
+    } else {
+        parse_str(file_get_contents("php://input"), $data);
+        $id = $data['id'] ?? null;
+    }
     
     try {
         $query = "UPDATE terapeuticas SET ativo = 0 WHERE id = :id";
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $data['id']);
+        $stmt->bindParam(':id', $id);
 
         if ($stmt->execute()) {
+            // If form submission, redirect back
+            if (isset($_POST['id'])) {
+                header('Location: ../app.html#terapeuticas');
+                exit();
+            }
             echo json_encode(['success' => true, 'message' => 'Terapêutica desativada com sucesso']);
         }
     } catch (PDOException $e) {

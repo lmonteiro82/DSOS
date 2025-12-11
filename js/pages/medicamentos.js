@@ -65,8 +65,12 @@ async function loadMedicamentos() {
                         ${Auth.isAdminGeral() ? `<td>${med.lar_nome}</td>` : ''}
                         <td>
                             ${Auth.isAdmin() ? `
-                                <button class="btn btn-sm btn-outline" onclick='showEditMedicamentoModal(${JSON.stringify(med).replace(/'/g, "&apos;")})'>Editar</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteMedicamento(${med.id})">Eliminar</button>
+                                <button class="btn btn-sm btn-outline btn-edit-med" data-med='${JSON.stringify(med)}'>Editar</button>
+                                <form method="POST" action="api/medicamentos.php" style="display:inline;" onsubmit="return confirm('Tem a certeza que deseja eliminar ${med.nome.replace(/'/g, "\\'")}?');">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="id" value="${med.id}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                </form>
                             ` : '-'}
                         </td>
                     </tr>
@@ -78,6 +82,14 @@ async function loadMedicamentos() {
 
         html += '</div>';
         pageContent.innerHTML = html;
+        
+        // Attach edit button handlers
+        document.querySelectorAll('.btn-edit-med').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const med = JSON.parse(btn.getAttribute('data-med'));
+                showEditMedicamentoModal(med);
+            });
+        });
     } catch (error) {
         showToast('Erro ao carregar medicamentos', 'error');
     }
@@ -134,7 +146,7 @@ function showCreateMedicamentoModal() {
 }
 
 async function createMedicamento() {
-    const data = {
+    const medicamentoData = {
         nome: document.getElementById('medNome').value,
         principio_ativo: document.getElementById('medPrincipioAtivo').value,
         marca: document.getElementById('medMarca').value,
@@ -144,9 +156,26 @@ async function createMedicamento() {
     };
 
     try {
-        await MedicamentosAPI.create(data);
+        // 1. Criar medicamento
+        const medResult = await MedicamentosAPI.create(medicamentoData);
+        const medicamentoId = medResult.id;
+        
+        // 2. Criar stock inicial (contador a 0) para todos os utentes do lar
+        const utentesResponse = await UtentesAPI.getAll();
+        const utentesDoLar = utentesResponse.data.filter(u => u.lar_id === medicamentoData.lar_id);
+        
+        // Criar stock para cada utente (quantidade inicial = 0)
+        for (const utente of utentesDoLar) {
+            await StocksAPI.create({
+                medicamento_id: medicamentoId,
+                utente_id: utente.id,
+                quantidade: 0,
+                quantidade_minima: 0
+            });
+        }
+        
         closeModal();
-        showToast('Medicamento criado com sucesso', 'success');
+        showToast('Medicamento e stock criados com sucesso', 'success');
         reloadCurrentPage();
     } catch (error) {
         showToast('Erro: ' + error.message, 'error');
