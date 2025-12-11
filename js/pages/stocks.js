@@ -135,10 +135,6 @@ function showAddStockModal() {
                 <input type="number" id="stockQuantidadeMinima" value="10" min="0">
             </div>
             <div class="form-group">
-                <label>Lote</label>
-                <input type="text" id="stockLote">
-            </div>
-            <div class="form-group">
                 <label>Data de Validade</label>
                 <input type="date" id="stockDataValidade">
             </div>
@@ -159,7 +155,7 @@ async function addStock() {
         medicamento_id: parseInt(document.getElementById('stockMedicamento').value),
         quantidade: parseInt(document.getElementById('stockQuantidade').value),
         quantidade_minima: parseInt(document.getElementById('stockQuantidadeMinima').value),
-        lote: document.getElementById('stockLote').value,
+        
         data_validade: document.getElementById('stockDataValidade').value || null
     };
 

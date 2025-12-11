@@ -11,11 +11,16 @@ $database = new Database();
 $db = $database->connect();
 
 // Get user info
-$query = "SELECT role, lar_id FROM users WHERE id = :user_id";
+$query = "SELECT nome, role, lar_id FROM users WHERE id = :user_id";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Prepare user display info for sidebar to match SPA
+$displayName = isset($user['nome']) ? $user['nome'] : 'Utilizador';
+$displayRole = ($user['role'] === 'admin_geral') ? 'Administrador Geral' : 'Administrador';
+$avatarLetter = strtoupper(mb_substr($displayName, 0, 1, 'UTF-8'));
 
 // Get Stock Geral por Medicamento - mostra quantidade total em stock (inventário)
 if ($user['role'] === 'admin_geral') {
@@ -176,13 +181,13 @@ function getTipoTomaLabel($toma) {
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-avatar"><?php echo htmlspecialchars($avatarLetter); ?></div>
                     <div class="user-details">
-                        <div class="user-name" id="userName">Utilizador</div>
-                        <div class="user-role" id="userRole">Role</div>
+                        <div class="user-name"><?php echo htmlspecialchars($displayName); ?></div>
+                        <div class="user-role"><?php echo htmlspecialchars($displayRole); ?></div>
                     </div>
                 </div>
-                <a href="api/auth.php?logout=1" class="btn-logout" id="logoutBtn">
+                <a href="api/auth.php?logout=1" class="btn-logout">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                         <polyline points="16 17 21 12 16 7"/>
@@ -310,10 +315,6 @@ function getTipoTomaLabel($toma) {
                         <label>Quantidade a Adicionar *</label>
                         <input type="number" name="quantidade" required min="1" value="10">
                         <small style="color: var(--gray-600);">Esta quantidade será adicionada ao stock de todos os utentes</small>
-                    </div>
-                    <div class="form-group">
-                        <label>Lote</label>
-                        <input type="text" name="lote" placeholder="Ex: ABC123">
                     </div>
                     <div class="form-group">
                         <label>Data de Validade *</label>
