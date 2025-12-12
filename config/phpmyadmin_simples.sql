@@ -114,7 +114,6 @@ CREATE TABLE `stocks` (
   `quantidade` int(11) NOT NULL DEFAULT 0,
   `quantidade_minima` int(11) DEFAULT 10,
   `lote` varchar(100) DEFAULT NULL,
-  `data_validade` date DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),

@@ -31,7 +31,7 @@ Sistema completo para gestão de terapêuticas em lares de 3ª idade, desenvolvi
 - Stock por utente (para imputação de despesas)
 - Stock geral do lar (para emergências)
 - Alertas de stock baixo
-- Controlo de lotes e validades
+- Controlo de lotes
 
 ### Administração de Medicamentos
 - Registo de administrações

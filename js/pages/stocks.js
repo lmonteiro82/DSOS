@@ -18,8 +18,8 @@ async function loadStocks() {
         let html = `
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Administrações</h1>
-                    <p class="page-subtitle">Contagem de administrações de medicamentos</p>
+                    <h1 class="page-title">Stocks</h1>
+                    <p class="page-subtitle">Gestão de stocks de medicamentos</p>
                 </div>
                 <button class="btn btn-primary" onclick="showAddStockModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -71,7 +71,7 @@ async function loadStocks() {
             <!-- Stock por Utente -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Administrações por Utente</h3>
+                    <h3 class="card-title">Stock por Utente</h3>
                 </div>
                 <div class="table-container">
                     <table>
@@ -79,7 +79,7 @@ async function loadStocks() {
                             <tr>
                                 <th>Utente</th>
                                 <th>Medicamento</th>
-                                <th>Total Administrações</th>
+                                <th>Quantidade</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,10 +134,6 @@ function showAddStockModal() {
                 <label>Quantidade Mínima</label>
                 <input type="number" id="stockQuantidadeMinima" value="10" min="0">
             </div>
-            <div class="form-group">
-                <label>Data de Validade</label>
-                <input type="date" id="stockDataValidade">
-            </div>
         </form>
     `;
 
@@ -155,8 +151,6 @@ async function addStock() {
         medicamento_id: parseInt(document.getElementById('stockMedicamento').value),
         quantidade: parseInt(document.getElementById('stockQuantidade').value),
         quantidade_minima: parseInt(document.getElementById('stockQuantidadeMinima').value),
-        
-        data_validade: document.getElementById('stockDataValidade').value || null
     };
 
     try {
@@ -193,10 +187,6 @@ function showEditStockModal(stock) {
                 <label>Lote</label>
                 <input type="text" id="stockLote" value="${stock.lote || ''}">
             </div>
-            <div class="form-group">
-                <label>Data de Validade</label>
-                <input type="date" id="stockDataValidade" value="${stock.data_validade || ''}">
-            </div>
         </form>
     `;
 
@@ -213,8 +203,7 @@ async function updateStock() {
         id: parseInt(document.getElementById('stockId').value),
         quantidade: parseInt(document.getElementById('stockQuantidade').value),
         quantidade_minima: parseInt(document.getElementById('stockQuantidadeMinima').value),
-        lote: document.getElementById('stockLote').value,
-        data_validade: document.getElementById('stockDataValidade').value || null
+        lote: document.getElementById('stockLote').value
     };
 
     try {

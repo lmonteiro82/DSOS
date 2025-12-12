@@ -17,6 +17,16 @@ $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Lista de utentes ativos para o modal (admin_geral: todos; admin_lar: do seu lar)
+if ($user['role'] === 'admin_geral') {
+    $stmtUt = $db->prepare("SELECT u.id, u.nome, l.nome as lar_nome FROM utentes u JOIN lares l ON u.lar_id = l.id WHERE u.ativo = 1 ORDER BY l.nome, u.nome");
+} else {
+    $stmtUt = $db->prepare("SELECT id, nome FROM utentes WHERE ativo = 1 AND lar_id = :lar_id ORDER BY nome");
+    $stmtUt->bindParam(':lar_id', $user['lar_id']);
+}
+$stmtUt->execute();
+$utentesList = $stmtUt->fetchAll(PDO::FETCH_ASSOC);
+
 // Prepare user display info for sidebar to match SPA
 $displayName = isset($user['nome']) ? $user['nome'] : 'Utilizador';
 $displayRole = ($user['role'] === 'admin_geral') ? 'Administrador Geral' : 'Administrador';
@@ -25,8 +35,7 @@ $avatarLetter = strtoupper(mb_substr($displayName, 0, 1, 'UTF-8'));
 // Get Stock Geral por Medicamento - mostra quantidade total em stock (inventário)
 if ($user['role'] === 'admin_geral') {
     $query = "SELECT m.nome as medicamento_nome, m.dose, m.toma, l.nome as lar_nome,
-              COALESCE(SUM(s.quantidade), 0) as quantidade_total,
-              (SELECT data_validade FROM stocks WHERE medicamento_id = m.id ORDER BY updated_at DESC LIMIT 1) as data_validade
+              COALESCE(SUM(s.quantidade), 0) as quantidade_total
               FROM medicamentos m
               JOIN lares l ON m.lar_id = l.id
               LEFT JOIN stocks s ON s.medicamento_id = m.id
@@ -36,8 +45,7 @@ if ($user['role'] === 'admin_geral') {
     $stmt = $db->prepare($query);
 } else {
     $query = "SELECT m.nome as medicamento_nome, m.dose, m.toma,
-              COALESCE(SUM(s.quantidade), 0) as quantidade_total,
-              (SELECT data_validade FROM stocks WHERE medicamento_id = m.id ORDER BY updated_at DESC LIMIT 1) as data_validade
+              COALESCE(SUM(s.quantidade), 0) as quantidade_total
               FROM medicamentos m
               LEFT JOIN stocks s ON s.medicamento_id = m.id
               WHERE m.ativo = 1 AND m.lar_id = :lar_id
@@ -49,29 +57,25 @@ if ($user['role'] === 'admin_geral') {
 $stmt->execute();
 $stockGeral = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get Stock por Utente - conta administrações validadas por utente e medicamento
+// Get Stock por Utente - listar quantidade de stock por utente e medicamento
 if ($user['role'] === 'admin_geral') {
     $query = "SELECT u.id as utente_id, u.nome as utente_nome, m.id as medicamento_id,
               m.nome as medicamento_nome, m.dose, m.toma,
-              COUNT(CASE WHEN a.validada = 1 AND a.administrada = 1 THEN 1 END) as quantidade
-              FROM utentes u
-              CROSS JOIN medicamentos m
-              LEFT JOIN terapeuticas t ON t.utente_id = u.id AND t.medicamento_id = m.id
-              LEFT JOIN administracoes a ON a.terapeutica_id = t.id
+              s.quantidade as quantidade
+              FROM stocks s
+              JOIN utentes u ON s.utente_id = u.id
+              JOIN medicamentos m ON s.medicamento_id = m.id
               WHERE u.ativo = 1 AND m.ativo = 1
-              GROUP BY u.id, m.id
               ORDER BY u.nome, m.nome";
     $stmt = $db->prepare($query);
 } else {
     $query = "SELECT u.id as utente_id, u.nome as utente_nome, m.id as medicamento_id,
               m.nome as medicamento_nome, m.dose, m.toma,
-              COUNT(CASE WHEN a.validada = 1 AND a.administrada = 1 THEN 1 END) as quantidade
-              FROM utentes u
-              CROSS JOIN medicamentos m
-              LEFT JOIN terapeuticas t ON t.utente_id = u.id AND t.medicamento_id = m.id
-              LEFT JOIN administracoes a ON a.terapeutica_id = t.id
-              WHERE u.ativo = 1 AND m.ativo = 1 AND u.lar_id = :lar_id AND m.lar_id = :lar_id
-              GROUP BY u.id, m.id
+              s.quantidade as quantidade
+              FROM stocks s
+              JOIN utentes u ON s.utente_id = u.id
+              JOIN medicamentos m ON s.medicamento_id = m.id
+              WHERE u.lar_id = :lar_id AND m.lar_id = :lar_id AND u.ativo = 1 AND m.ativo = 1
               ORDER BY u.nome, m.nome";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':lar_id', $user['lar_id']);
@@ -230,7 +234,6 @@ function getTipoTomaLabel($toma) {
                                             <th>Lar</th>
                                         <?php endif; ?>
                                         <th>Quantidade em Stock</th>
-                                        <th>Validade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -243,7 +246,6 @@ function getTipoTomaLabel($toma) {
                                                 <td><?= htmlspecialchars($sg['lar_nome']) ?></td>
                                             <?php endif; ?>
                                             <td><span class="badge badge-success"><?= $sg['quantidade_total'] ?></span></td>
-                                            <td><?= $sg['data_validade'] ? date('d/m/Y', strtotime($sg['data_validade'])) : '-' ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -254,7 +256,7 @@ function getTipoTomaLabel($toma) {
 
                 <!-- Stock por Utente -->
                 <div class="card">
-                    <h2 style="margin-bottom: 20px;">Administrações por Utente</h2>
+                    <h2 style="margin-bottom: 20px;">Stock por Utente</h2>
                     <?php if (empty($stocks)): ?>
                         <div class="empty-state">
                             <p>Nenhum stock encontrado</p>
@@ -266,7 +268,7 @@ function getTipoTomaLabel($toma) {
                                     <tr>
                                         <th>Utente</th>
                                         <th>Medicamento</th>
-                                        <th>Total Administrações</th>
+                                        <th>Quantidade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -277,7 +279,7 @@ function getTipoTomaLabel($toma) {
                                                 <?= htmlspecialchars($s['medicamento_nome']) ?><br>
                                                 <small><?= htmlspecialchars($s['dose']) ?> - <?= getTipoTomaLabel($s['toma']) ?></small>
                                             </td>
-                                            <td><span class="badge badge-primary"><?= $s['quantidade'] ?></span></td>
+                                            <td><span class="badge badge-success"><?= $s['quantidade'] ?></span></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -295,15 +297,23 @@ function getTipoTomaLabel($toma) {
     <script src="js/utils.js"></script>
     <script>
         // Get data for modal
-        const utentes = <?= json_encode($stocks) ?>;
+        const utentes = <?= json_encode($utentesList) ?>;
         const medicamentos = <?= json_encode($stockGeral) ?>;
         
         function showAddStockModal() {
             const medicamentosList = [...new Map(medicamentos.map(m => [m.medicamento_nome, {nome: m.medicamento_nome}])).values()];
             const medicamentosOptions = medicamentosList.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
+            const utentesOptions = utentes.map(u => `<option value="${u.id}">${u.nome}${u.lar_nome ? ' ('+u.lar_nome+')' : ''}</option>`).join('');
             
             const content = `
                 <form method="POST" action="adicionar_stock_action.php">
+                    <div class="form-group">
+                        <label>Utente *</label>
+                        <select name="utente_id" id="selectUtente" required>
+                            <option value="">Selecione...</option>
+                            ${utentesOptions}
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>Medicamento *</label>
                         <select name="medicamento_nome" id="selectMedicamento" required>
@@ -314,12 +324,9 @@ function getTipoTomaLabel($toma) {
                     <div class="form-group">
                         <label>Quantidade a Adicionar *</label>
                         <input type="number" name="quantidade" required min="1" value="10">
-                        <small style="color: var(--gray-600);">Esta quantidade será adicionada ao stock de todos os utentes</small>
+                        <small style="color: var(--gray-600);">A quantidade será adicionada ao stock do utente selecionado</small>
                     </div>
-                    <div class="form-group">
-                        <label>Data de Validade *</label>
-                        <input type="date" name="data_validade" required>
-                    </div>
+                    
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button type="button" class="btn btn-outline" onclick="closeModal()" style="flex: 1;">Cancelar</button>
                         <button type="submit" class="btn btn-primary" style="flex: 1;">Adicionar Stock</button>

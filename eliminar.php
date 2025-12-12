@@ -50,6 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
         $stmt = $db->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
+
+        // Extra: se for utente, remover stocks associados (soft delete não ativa cascata)
+        if ($tipo === 'utente') {
+            $del = $db->prepare("DELETE FROM stocks WHERE utente_id = :id");
+            $del->bindParam(':id', $id);
+            $del->execute();
+        }
         
         header("Location: app.html#$redirect?success=deleted");
         exit();

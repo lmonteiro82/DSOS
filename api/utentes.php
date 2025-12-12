@@ -157,12 +157,27 @@ else if ($method === 'DELETE') {
         $stmt->bindParam(':id', $id);
 
         if ($stmt->execute()) {
+            // Remover administrações associadas às terapêuticas do utente
+            $delAdm = $db->prepare("DELETE a FROM administracoes a JOIN terapeuticas t ON a.terapeutica_id = t.id WHERE t.utente_id = :id");
+            $delAdm->bindParam(':id', $id);
+            $delAdm->execute();
+
+            // Remover terapêuticas do utente (horários são apagados por cascade)
+            $delTer = $db->prepare("DELETE FROM terapeuticas WHERE utente_id = :id");
+            $delTer->bindParam(':id', $id);
+            $delTer->execute();
+
+            // Remover todos os stocks associados ao utente
+            $del = $db->prepare("DELETE FROM stocks WHERE utente_id = :id");
+            $del->bindParam(':id', $id);
+            $del->execute();
+
             // If form submission, redirect back
             if (isset($_POST['id'])) {
                 header('Location: ../app.html#utentes');
                 exit();
             }
-            echo json_encode(['success' => true, 'message' => 'Utente desativado com sucesso']);
+            echo json_encode(['success' => true, 'message' => 'Utente desativado com sucesso e dados associados (terapêuticas, administrações, stocks) removidos']);
         }
     } catch (PDOException $e) {
         http_response_code(500);

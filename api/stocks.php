@@ -75,32 +75,28 @@ if ($method === 'GET') {
                 $stmt->bindParam(':lar_id', $user['lar_id']);
             }
         }
-        // Todos os stocks - conta administrações validadas por utente e medicamento
+        // Todos os stocks - listar quantidade de stock por utente e medicamento
         else {
             if ($user['role'] === 'admin_geral') {
-                $query = "SELECT u.id as utente_id, u.nome as utente_nome, 
+                $query = "SELECT u.id as utente_id, u.nome as utente_nome,
                           m.id as medicamento_id, m.nome as medicamento_nome, m.dose, m.toma,
                           l.nome as lar_nome,
-                          COUNT(CASE WHEN a.validada = 1 AND a.administrada = 1 THEN 1 END) as quantidade
-                          FROM utentes u
-                          CROSS JOIN medicamentos m
+                          s.quantidade as quantidade
+                          FROM stocks s
+                          JOIN utentes u ON s.utente_id = u.id
+                          JOIN medicamentos m ON s.medicamento_id = m.id
                           JOIN lares l ON u.lar_id = l.id
-                          LEFT JOIN terapeuticas t ON t.utente_id = u.id AND t.medicamento_id = m.id
-                          LEFT JOIN administracoes a ON a.terapeutica_id = t.id
                           WHERE u.ativo = 1 AND m.ativo = 1
-                          GROUP BY u.id, m.id, l.id
                           ORDER BY l.nome, u.nome, m.nome";
                 $stmt = $db->prepare($query);
             } else {
                 $query = "SELECT u.id as utente_id, u.nome as utente_nome,
                           m.id as medicamento_id, m.nome as medicamento_nome, m.dose, m.toma,
-                          COUNT(CASE WHEN a.validada = 1 AND a.administrada = 1 THEN 1 END) as quantidade
-                          FROM utentes u
-                          CROSS JOIN medicamentos m
-                          LEFT JOIN terapeuticas t ON t.utente_id = u.id AND t.medicamento_id = m.id
-                          LEFT JOIN administracoes a ON a.terapeutica_id = t.id
-                          WHERE u.ativo = 1 AND m.ativo = 1 AND u.lar_id = :lar_id AND m.lar_id = :lar_id
-                          GROUP BY u.id, m.id
+                          s.quantidade as quantidade
+                          FROM stocks s
+                          JOIN utentes u ON s.utente_id = u.id
+                          JOIN medicamentos m ON s.medicamento_id = m.id
+                          WHERE u.lar_id = :lar_id AND m.lar_id = :lar_id AND u.ativo = 1 AND m.ativo = 1
                           ORDER BY u.nome, m.nome";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':lar_id', $user['lar_id']);
@@ -135,12 +131,10 @@ else if ($method === 'POST') {
             $stock = $stmt->fetch(PDO::FETCH_ASSOC);
             $nova_quantidade = $stock['quantidade'] + $data->quantidade;
             
-            $query = "UPDATE stocks SET quantidade = :quantidade, lote = :lote, 
-                      data_validade = :data_validade WHERE id = :id";
+            $query = "UPDATE stocks SET quantidade = :quantidade, lote = :lote WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':quantidade', $nova_quantidade);
             $stmt->bindParam(':lote', $data->lote);
-            $stmt->bindParam(':data_validade', $data->data_validade);
             $stmt->bindParam(':id', $stock['id']);
             $stmt->execute();
             
@@ -148,9 +142,9 @@ else if ($method === 'POST') {
         } else {
             // Criar novo stock
             $query = "INSERT INTO stocks (medicamento_id, utente_id, quantidade, 
-                      quantidade_minima, lote, data_validade) 
+                      quantidade_minima, lote) 
                       VALUES (:medicamento_id, :utente_id, :quantidade, :quantidade_minima, 
-                      :lote, :data_validade)";
+                      :lote)";
             
             $stmt = $db->prepare($query);
             $stmt->bindParam(':medicamento_id', $data->medicamento_id);
@@ -158,7 +152,6 @@ else if ($method === 'POST') {
             $stmt->bindParam(':quantidade', $data->quantidade);
             $stmt->bindParam(':quantidade_minima', $data->quantidade_minima);
             $stmt->bindParam(':lote', $data->lote);
-            $stmt->bindParam(':data_validade', $data->data_validade);
 
             if ($stmt->execute()) {
                 echo json_encode([
@@ -180,13 +173,12 @@ else if ($method === 'PUT') {
 
     try {
         $query = "UPDATE stocks SET quantidade = :quantidade, quantidade_minima = :quantidade_minima, 
-                  lote = :lote, data_validade = :data_validade WHERE id = :id";
+                  lote = :lote WHERE id = :id";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':quantidade', $data->quantidade);
         $stmt->bindParam(':quantidade_minima', $data->quantidade_minima);
         $stmt->bindParam(':lote', $data->lote);
-        $stmt->bindParam(':data_validade', $data->data_validade);
         $stmt->bindParam(':id', $data->id);
 
         if ($stmt->execute()) {
