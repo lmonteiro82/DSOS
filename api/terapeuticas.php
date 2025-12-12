@@ -78,6 +78,19 @@ if ($method === 'GET') {
 
 // POST - Criar terapêutica
 else if ($method === 'POST') {
+    // Verificar permissões - técnicos não podem criar terapêuticas
+    $query = "SELECT role FROM users WHERE id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user['role'] === 'tecnico') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Sem permissões para criar terapêuticas']);
+        exit();
+    }
+    
     $data = json_decode(file_get_contents("php://input"));
 
     try {
@@ -130,6 +143,19 @@ else if ($method === 'POST') {
 
 // PUT - Atualizar terapêutica
 else if ($method === 'PUT') {
+    // Verificar permissões - técnicos não podem editar terapêuticas
+    $query = "SELECT role FROM users WHERE id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user['role'] === 'tecnico') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Sem permissões para editar terapêuticas']);
+        exit();
+    }
+    
     $data = json_decode(file_get_contents("php://input"));
 
     try {
@@ -153,6 +179,19 @@ else if ($method === 'PUT') {
 
 // DELETE - Desativar terapêutica
 else if ($method === 'DELETE') {
+    // Verificar permissões - técnicos não podem eliminar terapêuticas
+    $query = "SELECT role FROM users WHERE id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user['role'] === 'tecnico') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Sem permissões para eliminar terapêuticas']);
+        exit();
+    }
+    
     // Support both JSON and form data
     if (isset($_POST['id'])) {
         $id = $_POST['id'];

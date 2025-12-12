@@ -42,9 +42,7 @@ async function loadDashboard() {
                 </div>
                 <div class="stat-content">
                     <div class="stat-label">Utentes</div>
-                    <div class="stat-value">${Auth.isAdminGeral() ? 
-                        (stats.utentes_por_lar?.reduce((sum, l) => sum + parseInt(l.total_utentes), 0) || 0) : 
-                        (stats.total_utentes || 0)}</div>
+                    <div class="stat-value">${stats.utentes_por_lar?.reduce((sum, l) => sum + parseInt(l.total_utentes), 0) || 0}</div>
                 </div>
             </div>
 
@@ -75,8 +73,8 @@ async function loadDashboard() {
         </div>
         `;
 
-        // Utentes por lar (Admin Geral)
-        if (Auth.isAdminGeral() && stats.utentes_por_lar) {
+        // Utentes por lar (sempre mostrar)
+        if (stats.utentes_por_lar) {
             html += `
                 <div class="card">
                     <div class="card-header">
@@ -160,7 +158,7 @@ async function loadDashboard() {
                                 <tr>
                                     <th>Utente</th>
                                     <th>Nº Utente</th>
-                                    ${Auth.isAdminGeral() ? '<th>Lar</th>' : ''}
+                                    <th>Lar</th>
                                     <th>Total SOS</th>
                                 </tr>
                             </thead>
@@ -172,7 +170,7 @@ async function loadDashboard() {
                     <tr>
                         <td><strong>${utente.nome}</strong></td>
                         <td>${utente.numero_utente}</td>
-                        ${Auth.isAdminGeral() ? `<td>${utente.lar_nome || '-'}</td>` : ''}
+                        <td>${utente.lar_nome || '-'}</td>
                         <td>${utente.total_sos}</td>
                     </tr>
                 `;
@@ -199,7 +197,7 @@ async function loadDashboard() {
                                 <tr>
                                     <th>Medicamento</th>
                                     <th>Utente</th>
-                                    ${Auth.isAdminGeral() ? '<th>Lar</th>' : ''}
+                                    <th>Lar</th>
                                     <th>Quantidade</th>
                                     <th>Mínimo</th>
                                 </tr>
@@ -212,7 +210,7 @@ async function loadDashboard() {
                     <tr>
                         <td><strong>${stock.medicamento_nome}</strong></td>
                         <td>${stock.utente_nome}</td>
-                        ${Auth.isAdminGeral() ? `<td>${stock.lar_nome || '-'}</td>` : ''}
+                        <td>${stock.lar_nome || '-'}</td>
                         <td><span class="badge badge-danger">${stock.quantidade}</span></td>
                         <td>${stock.quantidade_minima}</td>
                     </tr>

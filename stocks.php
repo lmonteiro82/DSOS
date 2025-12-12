@@ -29,7 +29,7 @@ $utentesList = $stmtUt->fetchAll(PDO::FETCH_ASSOC);
 
 // Prepare user display info for sidebar to match SPA
 $displayName = isset($user['nome']) ? $user['nome'] : 'Utilizador';
-$displayRole = ($user['role'] === 'admin_geral') ? 'Administrador Geral' : 'Administrador';
+$displayRole = ($user['role'] === 'admin_geral') ? 'Administrador Geral' : (($user['role'] === 'tecnico') ? 'Técnico' : 'Administrador de Lar');
 $avatarLetter = strtoupper(mb_substr($displayName, 0, 1, 'UTF-8'));
 
 // Get Stock Geral por Medicamento - mostra quantidade total em stock (inventário)
@@ -132,6 +132,7 @@ function getTipoTomaLabel($toma) {
                     <span>Lares</span>
                 </a>
                 <?php endif; ?>
+                <?php if ($user['role'] !== 'tecnico'): ?>
                 <a href="app.html#utentes" class="nav-item" data-page="utentes">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -163,6 +164,17 @@ function getTipoTomaLabel($toma) {
                     </svg>
                     <span>Terapêuticas</span>
                 </a>
+                <?php endif; ?>
+                <?php if ($user['role'] !== 'tecnico'): ?>
+                <a href="users.php" class="nav-item" id="navUsers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <polyline points="17 11 19 13 23 9"/>
+                    </svg>
+                    <span>Utilizadores</span>
+                </a>
+                <?php endif; ?>
                 <a href="stocks.php" class="nav-item active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
@@ -172,7 +184,7 @@ function getTipoTomaLabel($toma) {
                     </svg>
                     <span>Stocks</span>
                 </a>
-                <a href="app.html#administracoes" class="nav-item" data-page="administracoes">
+                <a href="administracoes.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>

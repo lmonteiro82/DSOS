@@ -58,6 +58,19 @@ if ($method === 'GET') {
 
 // POST - Criar utente
 else if ($method === 'POST') {
+    // Verificar permissões - técnicos não podem criar utentes
+    $query = "SELECT role FROM users WHERE id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user['role'] === 'tecnico') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Sem permissões para criar utentes']);
+        exit();
+    }
+    
     $data = json_decode(file_get_contents("php://input"));
     // Sanitize emergency contact phone
     if (isset($data->contacto_emergencia_telefone)) {
@@ -109,6 +122,19 @@ else if ($method === 'POST') {
 
 // PUT - Atualizar utente
 else if ($method === 'PUT') {
+    // Verificar permissões - técnicos não podem editar utentes
+    $query = "SELECT role FROM users WHERE id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user['role'] === 'tecnico') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Sem permissões para editar utentes']);
+        exit();
+    }
+    
     $data = json_decode(file_get_contents("php://input"));
     // Sanitize emergency contact phone
     if (isset($data->contacto_emergencia_telefone)) {
@@ -143,6 +169,19 @@ else if ($method === 'PUT') {
 
 // DELETE - Desativar utente
 else if ($method === 'DELETE') {
+    // Verificar permissões - técnicos não podem eliminar utentes
+    $query = "SELECT role FROM users WHERE id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user['role'] === 'tecnico') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Sem permissões para eliminar utentes']);
+        exit();
+    }
+    
     // Support both JSON and form data
     if (isset($_POST['id'])) {
         $id = $_POST['id'];

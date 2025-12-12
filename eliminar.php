@@ -10,8 +10,8 @@ if (!isset($_SESSION['user_id'])) {
 $database = new Database();
 $db = $database->connect();
 
-$tipo = $_GET['tipo'] ?? null;
-$id = $_GET['id'] ?? null;
+$tipo = $_GET['tipo'] ?? $_POST['tipo'] ?? null;
+$id = $_GET['id'] ?? $_POST['id'] ?? null;
 
 if (!$tipo || !$id) {
     header('Location: app.html');
@@ -19,7 +19,7 @@ if (!$tipo || !$id) {
 }
 
 // Handle confirmation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['confirmar']) || $tipo === 'user')) {
     try {
         switch ($tipo) {
             case 'utente':
@@ -42,6 +42,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
                 $redirect = 'terapeuticas';
                 $mensagem = 'Terapêutica eliminada';
                 break;
+            case 'user':
+                // Verificar se não é admin_geral
+                $checkQuery = "SELECT role FROM users WHERE id = :id";
+                $checkStmt = $db->prepare($checkQuery);
+                $checkStmt->bindParam(':id', $id);
+                $checkStmt->execute();
+                $userToDelete = $checkStmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($userToDelete['role'] === 'admin_geral') {
+                    $_SESSION['error'] = 'Não é possível eliminar administradores globais';
+                    header('Location: users.php');
+                    exit();
+                }
+                
+                $query = "UPDATE users SET ativo = 0 WHERE id = :id";
+                $redirect = 'users.php';
+                $mensagem = 'Utilizador eliminado';
+                break;
             default:
                 header('Location: app.html');
                 exit();
@@ -58,7 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
             $del->execute();
         }
         
-        header("Location: app.html#$redirect?success=deleted");
+        if ($tipo === 'user') {
+            $_SESSION['success'] = $mensagem;
+            header("Location: $redirect");
+        } else {
+            header("Location: app.html#$redirect?success=deleted");
+        }
         exit();
     } catch (Exception $e) {
         $erro = $e->getMessage();

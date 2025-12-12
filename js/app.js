@@ -37,8 +37,21 @@ function updateUserInfo() {
 
         // Show/hide navigation items based on role
         const navLares = document.getElementById('navLares');
+        const navUtentes = document.querySelector('[data-page="utentes"]');
+        const navMedicamentos = document.querySelector('[data-page="medicamentos"]');
+        const navTerapeuticas = document.querySelector('[data-page="terapeuticas"]');
+        const navUsers = document.getElementById('navUsers');
+        
         if (navLares) {
             navLares.style.display = Auth.isAdminGeral() ? 'flex' : 'none';
+        }
+        
+        // Técnicos não veem Utilizadores, Utentes, Medicamentos e Terapêuticas
+        if (Auth.isTecnico()) {
+            if (navUtentes) navUtentes.style.display = 'none';
+            if (navMedicamentos) navMedicamentos.style.display = 'none';
+            if (navTerapeuticas) navTerapeuticas.style.display = 'none';
+            if (navUsers) navUsers.style.display = 'none';
         }
     }
 }
@@ -100,6 +113,17 @@ async function loadPage(page) {
         return;
     }
     
+    // Check permissions
+    if (!canAccessPage(page)) {
+        pageContent.innerHTML = `
+            <div class="alert alert-error">
+                <h3>Acesso Negado</h3>
+                <p>Não tem permissões para aceder a esta página.</p>
+            </div>
+        `;
+        return;
+    }
+    
     pageContent.innerHTML = showLoading();
 
     try {
@@ -118,6 +142,9 @@ async function loadPage(page) {
                 break;
             case 'terapeuticas':
                 await loadTerapeuticas();
+                break;
+            case 'users':
+                await loadUsers();
                 break;
             case 'administracoes':
                 await loadAdministracoes();
@@ -161,4 +188,22 @@ async function loadPage(page) {
 // Reload current page
 function reloadCurrentPage() {
     loadPage(currentPage);
+}
+
+// Check if user can access a page
+function canAccessPage(page) {
+    // Admin Global tem acesso a tudo
+    if (Auth.isAdminGeral()) return true;
+    
+    // Admin de Lar não tem acesso a lares
+    if (Auth.isAdmin()) {
+        return page !== 'lares';
+    }
+    
+    // Técnico só tem acesso a dashboard e administrações (stocks é PHP separado)
+    if (Auth.isTecnico()) {
+        return page === 'dashboard' || page === 'administracoes';
+    }
+    
+    return false;
 }

@@ -262,3 +262,22 @@ const EstatisticasAPI = {
         return API.get('estatisticas.php');
     }
 };
+
+// Users API
+const UsersAPI = {
+    getAll() {
+        return API.get('users.php');
+    },
+
+    create(data) {
+        return API.post('users.php', data);
+    },
+
+    update(data) {
+        return API.put('users.php', data);
+    },
+
+    delete(id) {
+        return API.delete('users.php', { id });
+    }
+};

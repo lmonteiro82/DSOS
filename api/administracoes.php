@@ -36,6 +36,7 @@ if ($method === 'GET') {
         if ($user['role'] === 'admin_geral') {
             $query = "SELECT a.*, t.tipo as terapeutica_tipo, 
                       u.nome as utente_nome, m.nome as medicamento_nome,
+                      l.nome as lar_nome,
                       us_ter.nome as terapeuta_nome,
                       us_admin.nome as administrado_por_nome,
                       us2.nome as validada_por_nome
@@ -43,6 +44,7 @@ if ($method === 'GET') {
                       JOIN terapeuticas t ON a.terapeutica_id = t.id
                       JOIN utentes u ON t.utente_id = u.id
                       JOIN medicamentos m ON t.medicamento_id = m.id
+                      JOIN lares l ON a.lar_id = l.id
                       JOIN users us_ter ON t.criado_por = us_ter.id
                       JOIN users us_admin ON a.administrado_por = us_admin.id
                       LEFT JOIN users us2 ON a.validada_por = us2.id
@@ -61,7 +63,7 @@ if ($method === 'GET') {
                       JOIN users us_ter ON t.criado_por = us_ter.id
                       JOIN users us_admin ON a.administrado_por = us_admin.id
                       LEFT JOIN users us2 ON a.validada_por = us2.id
-                      WHERE u.lar_id = :lar_id
+                      WHERE a.lar_id = :lar_id
                       ORDER BY a.data_hora DESC";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':lar_id', $user['lar_id']);
@@ -70,7 +72,19 @@ if ($method === 'GET') {
         $stmt->execute();
         $administracoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo json_encode(['success' => true, 'data' => $administracoes]);
+        // Debug temporário
+        error_log("=== DEBUG ADMINISTRAÇÕES ===");
+        error_log("User ID: " . $_SESSION['user_id']);
+        error_log("User Role: " . $user['role']);
+        error_log("User Lar ID: " . ($user['lar_id'] ?? 'NULL'));
+        error_log("Total administrações encontradas: " . count($administracoes));
+        
+        echo json_encode(['success' => true, 'data' => $administracoes, 'debug' => [
+            'user_id' => $_SESSION['user_id'],
+            'role' => $user['role'],
+            'lar_id' => $user['lar_id'] ?? null,
+            'total' => count($administracoes)
+        ]]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
@@ -96,20 +110,25 @@ else if ($method === 'POST') {
     }
 
     try {
-        // Obter terapeuta associada à terapêutica
-        $qTer = $db->prepare("SELECT criado_por FROM terapeuticas WHERE id = :tid");
+        // Obter terapeuta e lar_id da terapêutica
+        $qTer = $db->prepare("SELECT t.criado_por, u.lar_id 
+                              FROM terapeuticas t 
+                              JOIN utentes u ON t.utente_id = u.id 
+                              WHERE t.id = :tid");
         $qTer->bindParam(':tid', $terapeutica_id);
         $qTer->execute();
         $terRow = $qTer->fetch(PDO::FETCH_ASSOC);
         $terapeuta_id = $terRow ? intval($terRow['criado_por']) : $_SESSION['user_id'];
+        $lar_id = $terRow ? intval($terRow['lar_id']) : null;
 
-        $query = "INSERT INTO administracoes (terapeutica_id, data_hora, administrada, 
+        $query = "INSERT INTO administracoes (terapeutica_id, lar_id, data_hora, administrada, 
                   motivo_nao_administracao, observacoes, administrado_por, validada) 
-                  VALUES (:terapeutica_id, :data_hora, :administrada, :motivo, 
+                  VALUES (:terapeutica_id, :lar_id, :data_hora, :administrada, :motivo, 
                   :observacoes, :administrado_por, 0)";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':terapeutica_id', $terapeutica_id);
+        $stmt->bindParam(':lar_id', $lar_id);
         $stmt->bindParam(':data_hora', $data_hora);
         $stmt->bindParam(':administrada', $administrada);
         $stmt->bindParam(':motivo', $motivo);

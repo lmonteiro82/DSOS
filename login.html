@@ -20,8 +20,8 @@
                 </div>
                 <div class="auth-form">
                     <div class="form-group">
-                        <label>Email ou Username</label>
-                        <input type="text" id="emailInput" placeholder="Digite seu email ou username">
+                        <label>Email</label>
+                        <input type="text" id="emailInput" placeholder="Digite seu email">
                     </div>
                     <div class="form-group">
                         <label>Password</label>
@@ -39,13 +39,7 @@
         if (localStorage.getItem('user')) {
             window.location.href = 'app.html';
         }
-        
-        // Test API connection on load
-        fetch('api/test.php')
-            .then(r => r.text())
-            .then(t => console.log('API Test:', t))
-            .catch(e => console.error('API Test Error:', e));
-        
+
         // Login function
         async function fazerLogin() {
             const email = document.getElementById('emailInput').value.trim();
