@@ -134,6 +134,14 @@ function showCreateMedicamentoModal() {
                 <label>Lar *</label>
                 <select id="medLar" required>${laresOptions}</select>
             </div>
+            <div class="form-group">
+                <label>Mínimo</label>
+                <input type="number" id="medMinimo" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label>Validade</label>
+                <input type="date" id="medValidade">
+            </div>
         </form>
     `;
 
@@ -152,7 +160,9 @@ async function createMedicamento() {
         marca: document.getElementById('medMarca').value,
         dose: document.getElementById('medDose').value,
         toma: document.getElementById('medToma').value,
-        lar_id: parseInt(document.getElementById('medLar').value)
+        lar_id: parseInt(document.getElementById('medLar').value),
+        minimo: parseInt(document.getElementById('medMinimo').value || '0'),
+        validade: document.getElementById('medValidade').value || null
     };
 
     try {
@@ -170,7 +180,7 @@ async function createMedicamento() {
                 medicamento_id: medicamentoId,
                 utente_id: utente.id,
                 quantidade: 0,
-                quantidade_minima: 0
+                quantidade_minima: medicamentoData.minimo
             });
         }
         
@@ -183,6 +193,9 @@ async function createMedicamento() {
 }
 
 function showEditMedicamentoModal(med) {
+    const medMinimo = (med.minimo !== undefined && med.minimo !== null) ? med.minimo : 0;
+    const medValidade = (med.validade !== undefined && med.validade !== null) ? med.validade : '';
+
     const content = `
         <form>
             <input type="hidden" id="medId" value="${med.id}">
@@ -216,6 +229,14 @@ function showEditMedicamentoModal(med) {
                     <option value="nasal" ${med.toma === 'nasal' ? 'selected' : ''}>Nasal</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>Mínimo</label>
+                <input type="number" id="medMinimo" min="0" value="${medMinimo}">
+            </div>
+            <div class="form-group">
+                <label>Validade</label>
+                <input type="date" id="medValidade" value="${medValidade}">
+            </div>
         </form>
     `;
 
@@ -234,7 +255,9 @@ async function updateMedicamento() {
         principio_ativo: document.getElementById('medPrincipioAtivo').value,
         marca: document.getElementById('medMarca').value,
         dose: document.getElementById('medDose').value,
-        toma: document.getElementById('medToma').value
+        toma: document.getElementById('medToma').value,
+        minimo: parseInt(document.getElementById('medMinimo').value || '0'),
+        validade: document.getElementById('medValidade').value || null
     };
 
     try {

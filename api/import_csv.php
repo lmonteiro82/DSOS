@@ -52,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                 continue;
             }
 
-            $query = "INSERT INTO medicamentos (nome, principio_ativo, marca, dose, toma, lar_id) 
-                      VALUES (:nome, :principio_ativo, :marca, :dose, :toma, :lar_id)";
+            $query = "INSERT INTO medicamentos (nome, principio_ativo, marca, dose, toma, minimo, validade, lar_id) 
+                      VALUES (:nome, :principio_ativo, :marca, :dose, :toma, :minimo, :validade, :lar_id)";
             
             $stmt = $db->prepare($query);
             $stmt->bindParam(':nome', $nome);
@@ -61,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             $stmt->bindParam(':marca', $marca);
             $stmt->bindParam(':dose', $dose);
             $stmt->bindParam(':toma', $toma);
+            $stmt->bindValue(':minimo', 0, PDO::PARAM_INT);
+            $stmt->bindValue(':validade', null, PDO::PARAM_NULL);
             $stmt->bindParam(':lar_id', $lar_id);
 
             if ($stmt->execute()) {

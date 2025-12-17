@@ -67,6 +67,8 @@ CREATE TABLE `medicamentos` (
   `marca` varchar(255) NOT NULL,
   `dose` varchar(100) NOT NULL,
   `toma` enum('oral','injetavel','topica','sublingual','inalacao','retal','ocular','auricular','nasal') NOT NULL,
+  `minimo` int(11) NOT NULL DEFAULT 0,
+  `validade` date DEFAULT NULL,
   `lar_id` int(11) NOT NULL,
   `ativo` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),

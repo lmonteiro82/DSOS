@@ -529,11 +529,61 @@ th {
     letter-spacing: 0.5px;
 }
 
+th:last-child {
+    text-align: right;
+}
+
 td {
     padding: 16px;
     border-top: 1px solid var(--gray-200);
     font-size: 14px;
     color: var(--gray-700);
+}
+
+td:last-child {
+    text-align: right;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-icon {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--gray-600);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    background: var(--gray-100);
+    color: var(--gray-800);
+}
+
+.btn-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+.btn-icon-danger {
+    color: var(--danger);
+}
+
+.btn-icon-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
 }
 
 tr:hover {
