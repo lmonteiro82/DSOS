@@ -146,10 +146,6 @@ function showCreateMedicamentoModal() {
                 <label>Mínimo</label>
                 <input type="number" id="medMinimo" min="0" value="0">
             </div>
-            <div class="form-group">
-                <label>Validade</label>
-                <input type="date" id="medValidade">
-            </div>
         </form>
     `;
 
@@ -170,8 +166,7 @@ async function createMedicamento() {
         toma: document.getElementById('medToma').value,
         sos: document.getElementById('medSOS').checked ? 1 : 0,
         lar_id: parseInt(document.getElementById('medLar').value),
-        minimo: parseInt(document.getElementById('medMinimo').value || '0'),
-        validade: document.getElementById('medValidade').value || null
+        minimo: parseInt(document.getElementById('medMinimo').value || '0')
     };
 
     try {
@@ -203,7 +198,6 @@ async function createMedicamento() {
 
 function showEditMedicamentoModal(med) {
     const medMinimo = (med.minimo !== undefined && med.minimo !== null) ? med.minimo : 0;
-    const medValidade = (med.validade !== undefined && med.validade !== null) ? med.validade : '';
 
     const content = `
         <form>
@@ -248,10 +242,6 @@ function showEditMedicamentoModal(med) {
                 <label>Mínimo</label>
                 <input type="number" id="medMinimo" min="0" value="${medMinimo}">
             </div>
-            <div class="form-group">
-                <label>Validade</label>
-                <input type="date" id="medValidade" value="${medValidade}">
-            </div>
         </form>
     `;
 
@@ -272,8 +262,7 @@ async function updateMedicamento() {
         dose: document.getElementById('medDose').value,
         toma: document.getElementById('medToma').value,
         sos: document.getElementById('medSOS').checked ? 1 : 0,
-        minimo: parseInt(document.getElementById('medMinimo').value || '0'),
-        validade: document.getElementById('medValidade').value || null
+        minimo: parseInt(document.getElementById('medMinimo').value || '0')
     };
 
     try {

@@ -75,7 +75,6 @@ else if ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"));
 
     $minimo = isset($data->minimo) ? (int)$data->minimo : 0;
-    $validade = (isset($data->validade) && $data->validade !== '') ? $data->validade : null;
 
     if ($minimo < 0) {
         http_response_code(400);
@@ -83,20 +82,11 @@ else if ($method === 'POST') {
         exit();
     }
 
-    if ($validade !== null) {
-        $dt = DateTime::createFromFormat('Y-m-d', $validade);
-        if (!$dt || $dt->format('Y-m-d') !== $validade) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Validade inválida']);
-            exit();
-        }
-    }
-
     try {
         $sos = isset($data->sos) ? (int)$data->sos : 0;
         
-        $query = "INSERT INTO medicamentos (nome, principio_ativo, marca, dose, toma, sos, minimo, validade, lar_id) 
-                  VALUES (:nome, :principio_ativo, :marca, :dose, :toma, :sos, :minimo, :validade, :lar_id)";
+        $query = "INSERT INTO medicamentos (nome, principio_ativo, marca, dose, toma, sos, minimo, lar_id) 
+                  VALUES (:nome, :principio_ativo, :marca, :dose, :toma, :sos, :minimo, :lar_id)";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':nome', $data->nome);
@@ -106,7 +96,6 @@ else if ($method === 'POST') {
         $stmt->bindParam(':toma', $data->toma);
         $stmt->bindValue(':sos', $sos, PDO::PARAM_INT);
         $stmt->bindValue(':minimo', $minimo, PDO::PARAM_INT);
-        $stmt->bindValue(':validade', $validade, $validade === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindParam(':lar_id', $data->lar_id);
 
         if ($stmt->execute()) {
@@ -140,7 +129,6 @@ else if ($method === 'PUT') {
     $data = json_decode(file_get_contents("php://input"));
 
     $minimo = isset($data->minimo) ? (int)$data->minimo : 0;
-    $validade = (isset($data->validade) && $data->validade !== '') ? $data->validade : null;
 
     if ($minimo < 0) {
         http_response_code(400);
@@ -148,20 +136,11 @@ else if ($method === 'PUT') {
         exit();
     }
 
-    if ($validade !== null) {
-        $dt = DateTime::createFromFormat('Y-m-d', $validade);
-        if (!$dt || $dt->format('Y-m-d') !== $validade) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Validade inválida']);
-            exit();
-        }
-    }
-
     try {
         $sos = isset($data->sos) ? (int)$data->sos : 0;
         
         $query = "UPDATE medicamentos SET nome = :nome, principio_ativo = :principio_ativo, 
-                  marca = :marca, dose = :dose, toma = :toma, sos = :sos, minimo = :minimo, validade = :validade WHERE id = :id";
+                  marca = :marca, dose = :dose, toma = :toma, sos = :sos, minimo = :minimo WHERE id = :id";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':nome', $data->nome);
@@ -171,7 +150,6 @@ else if ($method === 'PUT') {
         $stmt->bindParam(':toma', $data->toma);
         $stmt->bindValue(':sos', $sos, PDO::PARAM_INT);
         $stmt->bindValue(':minimo', $minimo, PDO::PARAM_INT);
-        $stmt->bindValue(':validade', $validade, $validade === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindParam(':id', $data->id);
 
         if ($stmt->execute()) {

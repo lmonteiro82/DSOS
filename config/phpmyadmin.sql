@@ -69,7 +69,6 @@ CREATE TABLE `medicamentos` (
   `toma` enum('oral','injetavel','topica','sublingual','inalacao','retal','ocular','auricular','nasal') NOT NULL,
   `sos` tinyint(1) NOT NULL DEFAULT 0,
   `minimo` int(11) NOT NULL DEFAULT 0,
-  `validade` date DEFAULT NULL,
   `lar_id` int(11) NOT NULL,
   `ativo` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
