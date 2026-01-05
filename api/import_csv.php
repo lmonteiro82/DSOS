@@ -1,4 +1,5 @@
 <?php
+ob_start();
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
@@ -28,14 +29,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
     try {
         $handle = fopen($file, 'r');
+        
+        // Ler o conteúdo e converter para UTF-8 se necessário
+        $content = file_get_contents($file);
+        $encoding = mb_detect_encoding($content, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+        if ($encoding !== 'UTF-8') {
+            $content = mb_convert_encoding($content, 'UTF-8', $encoding);
+            file_put_contents($file, $content);
+        }
+        
+        // Reabrir o ficheiro
+        $handle = fopen($file, 'r');
         $header = fgetcsv($handle, 1000, ',');
         
         $imported = 0;
         $errors = [];
+        $line_number = 1;
 
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+            $line_number++;
+            
+            // Ignorar linhas vazias
+            if (empty(array_filter($data))) {
+                continue;
+            }
+            
             if (count($data) < 5) {
-                $errors[] = "Linha inválida: " . implode(',', $data);
+                $errors[] = "Linha $line_number inválida: esperado 5 colunas, encontrado " . count($data);
                 continue;
             }
 
@@ -74,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
         fclose($handle);
 
+        ob_clean();
         echo json_encode([
             'success' => true,
             'message' => "$imported medicamentos importados com sucesso",
@@ -81,10 +102,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             'errors' => $errors
         ]);
     } catch (Exception $e) {
+        ob_clean();
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Erro ao importar: ' . $e->getMessage()]);
     }
 } else {
+    ob_clean();
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Ficheiro CSV não fornecido']);
 }

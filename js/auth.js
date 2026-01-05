@@ -17,21 +17,17 @@ const Auth = {
         }
     },
 
-    async logout() {
-        try {
-            await AuthAPI.logout();
-            this.currentUser = null;
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-            // Force logout even if API fails
-            this.currentUser = null;
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
-        }
+    logout() {
+        // Limpar dados locais imediatamente
+        this.currentUser = null;
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        
+        // Chamar API de logout em background (sem esperar)
+        AuthAPI.logout().catch(err => console.error('Logout API error:', err));
+        
+        // Redirecionar imediatamente
+        window.location.href = 'login.html';
     },
 
     async checkAuth() {

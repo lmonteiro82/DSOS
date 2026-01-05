@@ -47,6 +47,7 @@ async function loadMedicamentos() {
                                 <th>Marca</th>
                                 <th>Dose</th>
                                 <th>Toma</th>
+                                <th>SOS</th>
                                 ${Auth.isAdminGeral() ? '<th>Lar</th>' : ''}
                                 <th>Ações</th>
                             </tr>
@@ -62,6 +63,7 @@ async function loadMedicamentos() {
                         <td>${med.marca}</td>
                         <td>${med.dose}</td>
                         <td>${getBadge(getTipoTomaLabel(med.toma), 'info')}</td>
+                        <td>${med.sos ? getBadge('SIM', 'warning') : getBadge('NÃO', 'secondary')}</td>
                         ${Auth.isAdminGeral() ? `<td>${med.lar_nome}</td>` : ''}
                         <td>
                             ${Auth.isAdmin() ? `
@@ -131,6 +133,12 @@ function showCreateMedicamentoModal() {
                 </select>
             </div>
             <div class="form-group">
+                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                    <input type="checkbox" id="medSOS" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-weight: 500;">Medicamento SOS</span>
+                </label>
+            </div>
+            <div class="form-group">
                 <label>Lar *</label>
                 <select id="medLar" required>${laresOptions}</select>
             </div>
@@ -160,6 +168,7 @@ async function createMedicamento() {
         marca: document.getElementById('medMarca').value,
         dose: document.getElementById('medDose').value,
         toma: document.getElementById('medToma').value,
+        sos: document.getElementById('medSOS').checked ? 1 : 0,
         lar_id: parseInt(document.getElementById('medLar').value),
         minimo: parseInt(document.getElementById('medMinimo').value || '0'),
         validade: document.getElementById('medValidade').value || null
@@ -230,6 +239,12 @@ function showEditMedicamentoModal(med) {
                 </select>
             </div>
             <div class="form-group">
+                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                    <input type="checkbox" id="medSOS" ${med.sos ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-weight: 500;">Medicamento SOS</span>
+                </label>
+            </div>
+            <div class="form-group">
                 <label>Mínimo</label>
                 <input type="number" id="medMinimo" min="0" value="${medMinimo}">
             </div>
@@ -256,6 +271,7 @@ async function updateMedicamento() {
         marca: document.getElementById('medMarca').value,
         dose: document.getElementById('medDose').value,
         toma: document.getElementById('medToma').value,
+        sos: document.getElementById('medSOS').checked ? 1 : 0,
         minimo: parseInt(document.getElementById('medMinimo').value || '0'),
         validade: document.getElementById('medValidade').value || null
     };

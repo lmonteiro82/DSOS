@@ -203,7 +203,7 @@ function getTipoTomaLabel($toma) {
                         <div class="user-role"><?php echo htmlspecialchars($displayRole); ?></div>
                     </div>
                 </div>
-                <a href="api/auth.php?logout=1" class="btn-logout">
+                <a href="logout.php" class="btn-logout">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                         <polyline points="16 17 21 12 16 7"/>

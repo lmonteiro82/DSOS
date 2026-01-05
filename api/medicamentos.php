@@ -93,8 +93,10 @@ else if ($method === 'POST') {
     }
 
     try {
-        $query = "INSERT INTO medicamentos (nome, principio_ativo, marca, dose, toma, minimo, validade, lar_id) 
-                  VALUES (:nome, :principio_ativo, :marca, :dose, :toma, :minimo, :validade, :lar_id)";
+        $sos = isset($data->sos) ? (int)$data->sos : 0;
+        
+        $query = "INSERT INTO medicamentos (nome, principio_ativo, marca, dose, toma, sos, minimo, validade, lar_id) 
+                  VALUES (:nome, :principio_ativo, :marca, :dose, :toma, :sos, :minimo, :validade, :lar_id)";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':nome', $data->nome);
@@ -102,6 +104,7 @@ else if ($method === 'POST') {
         $stmt->bindParam(':marca', $data->marca);
         $stmt->bindParam(':dose', $data->dose);
         $stmt->bindParam(':toma', $data->toma);
+        $stmt->bindValue(':sos', $sos, PDO::PARAM_INT);
         $stmt->bindValue(':minimo', $minimo, PDO::PARAM_INT);
         $stmt->bindValue(':validade', $validade, $validade === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindParam(':lar_id', $data->lar_id);
@@ -155,8 +158,10 @@ else if ($method === 'PUT') {
     }
 
     try {
+        $sos = isset($data->sos) ? (int)$data->sos : 0;
+        
         $query = "UPDATE medicamentos SET nome = :nome, principio_ativo = :principio_ativo, 
-                  marca = :marca, dose = :dose, toma = :toma, minimo = :minimo, validade = :validade WHERE id = :id";
+                  marca = :marca, dose = :dose, toma = :toma, sos = :sos, minimo = :minimo, validade = :validade WHERE id = :id";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':nome', $data->nome);
@@ -164,6 +169,7 @@ else if ($method === 'PUT') {
         $stmt->bindParam(':marca', $data->marca);
         $stmt->bindParam(':dose', $data->dose);
         $stmt->bindParam(':toma', $data->toma);
+        $stmt->bindValue(':sos', $sos, PDO::PARAM_INT);
         $stmt->bindValue(':minimo', $minimo, PDO::PARAM_INT);
         $stmt->bindValue(':validade', $validade, $validade === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindParam(':id', $data->id);

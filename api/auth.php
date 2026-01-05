@@ -1,4 +1,5 @@
 <?php
+ob_start();
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST');
@@ -20,6 +21,7 @@ if ($method === 'POST' && ($action === 'login' || strpos($request_uri, '/login')
     
     // Debug
     if ($data === null) {
+        ob_clean();
         http_response_code(400);
         echo json_encode([
             'success' => false, 
@@ -31,6 +33,7 @@ if ($method === 'POST' && ($action === 'login' || strpos($request_uri, '/login')
     }
     
     if (!isset($data->email) || !isset($data->password)) {
+        ob_clean();
         http_response_code(400);
         echo json_encode([
             'success' => false, 
@@ -62,16 +65,19 @@ if ($method === 'POST' && ($action === 'login' || strpos($request_uri, '/login')
 
             unset($user['password']);
 
+            ob_clean();
             echo json_encode([
                 'success' => true,
                 'token' => $token,
                 'user' => $user
             ]);
         } else {
+            ob_clean();
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Credenciais inválidas']);
         }
     } catch (PDOException $e) {
+        ob_clean();
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Erro ao fazer login: ' . $e->getMessage()]);
     }
@@ -83,6 +89,7 @@ else if ($method === 'POST' && ($action === 'register' || strpos($request_uri, '
     
     // Verificar autenticação
     if (!isset($_SESSION['user_id'])) {
+        ob_clean();
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Não autorizado']);
         exit();
@@ -98,6 +105,7 @@ else if ($method === 'POST' && ($action === 'register' || strpos($request_uri, '
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
+            ob_clean();
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Email já registado']);
             exit();
@@ -116,6 +124,7 @@ else if ($method === 'POST' && ($action === 'register' || strpos($request_uri, '
         $stmt->bindParam(':lar_id', $data->lar_id);
 
         if ($stmt->execute()) {
+            ob_clean();
             echo json_encode([
                 'success' => true,
                 'message' => 'Utilizador criado com sucesso',
@@ -123,6 +132,7 @@ else if ($method === 'POST' && ($action === 'register' || strpos($request_uri, '
             ]);
         }
     } catch (PDOException $e) {
+        ob_clean();
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Erro ao criar utilizador: ' . $e->getMessage()]);
     }
@@ -133,6 +143,7 @@ else if ($method === 'GET' && ($action === 'me' || strpos($request_uri, '/me') !
     session_start();
     
     if (!isset($_SESSION['user_id'])) {
+        ob_clean();
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Não autorizado']);
         exit();
@@ -149,8 +160,10 @@ else if ($method === 'GET' && ($action === 'me' || strpos($request_uri, '/me') !
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         unset($user['password']);
 
+        ob_clean();
         echo json_encode(['success' => true, 'data' => $user]);
     } catch (PDOException $e) {
+        ob_clean();
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
     }
@@ -160,10 +173,12 @@ else if ($method === 'GET' && ($action === 'me' || strpos($request_uri, '/me') !
 else if ($method === 'POST' && ($action === 'logout' || strpos($request_uri, '/logout') !== false)) {
     session_start();
     session_destroy();
+    ob_clean();
     echo json_encode(['success' => true, 'message' => 'Logout efetuado com sucesso']);
 }
 
 else {
+    ob_clean();
     http_response_code(404);
     echo json_encode(['success' => false, 'message' => 'Endpoint não encontrado']);
 }

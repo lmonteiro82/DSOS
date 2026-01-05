@@ -35,8 +35,8 @@ if (!$administrada && empty($motivo)) {
 }
 
 try {
-    // Obter terapeuta e lar_id da terapêutica
-    $qTer = $db->prepare("SELECT t.criado_por, u.lar_id 
+    // Obter terapeuta, lar_id, utente_id e medicamento_id da terapêutica
+    $qTer = $db->prepare("SELECT t.criado_por, t.utente_id, t.medicamento_id, u.lar_id 
                           FROM terapeuticas t 
                           JOIN utentes u ON t.utente_id = u.id 
                           WHERE t.id = :tid");
@@ -45,6 +45,8 @@ try {
     $terRow = $qTer->fetch(PDO::FETCH_ASSOC);
     $terapeuta_id = $terRow ? intval($terRow['criado_por']) : $_SESSION['user_id'];
     $lar_id = $terRow ? intval($terRow['lar_id']) : null;
+    $utente_id = $terRow ? intval($terRow['utente_id']) : null;
+    $medicamento_id = $terRow ? intval($terRow['medicamento_id']) : null;
     
     if (!$lar_id) {
         $_SESSION['error'] = 'Erro: Lar não encontrado para esta terapêutica';
@@ -69,6 +71,19 @@ try {
 
     if ($stmt->execute()) {
         $newId = $db->lastInsertId();
+
+        // Se foi administrada, decrementar stock
+        if ($administrada && $utente_id && $medicamento_id) {
+            $stockQuery = "UPDATE stocks 
+                           SET quantidade = quantidade - 1 
+                           WHERE medicamento_id = :medicamento_id 
+                           AND utente_id = :utente_id 
+                           AND quantidade > 0";
+            $stockStmt = $db->prepare($stockQuery);
+            $stockStmt->bindParam(':medicamento_id', $medicamento_id);
+            $stockStmt->bindParam(':utente_id', $utente_id);
+            $stockStmt->execute();
+        }
 
         // Se NÃO foi administrada, validar automaticamente
         if (!$administrada) {
