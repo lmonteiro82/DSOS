@@ -1,0 +1,329 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Pharmacy API",
+    "collectionId": "pharmacy-api-collection",
+    "dateExported": "2026-01-20T13:45:35.000Z",
+    "version": "1.2",
+    "folders": [
+        {
+            "id": "orders-folder",
+            "name": "Orders",
+            "containerId": "",
+            "created": "2026-01-20T13:45:35.000Z"
+        },
+        {
+            "id": "history-folder",
+            "name": "History",
+            "containerId": "",
+            "created": "2026-01-20T13:45:35.000Z"
+        },
+        {
+            "id": "invoices-folder",
+            "name": "Invoices",
+            "containerId": "",
+            "created": "2026-01-20T13:45:35.000Z"
+        },
+        {
+            "id": "health-folder",
+            "name": "Health & Info",
+            "containerId": "",
+            "created": "2026-01-20T13:45:35.000Z"
+        }
+    ],
+    "requests": [
+        {
+            "id": "health-check",
+            "name": "Health Check",
+            "url": "http://localhost:3000/health",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [],
+            "params": [],
+            "tests": [],
+            "containerId": "health-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "api-info",
+            "name": "API Documentation",
+            "url": "http://localhost:3000/api",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [],
+            "params": [],
+            "tests": [],
+            "containerId": "health-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "create-order",
+            "name": "Create Single Order",
+            "url": "http://localhost:3000/api/orders",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nursingHomeId\": 1,\n  \"patientId\": 1,\n  \"items\": [\n    {\n      \"medicationId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"medicationId\": 3,\n      \"quantity\": 1\n    }\n  ]\n}",
+                "form": []
+            },
+            "tests": [],
+            "containerId": "orders-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "create-batch-orders",
+            "name": "Create Batch Orders",
+            "url": "http://localhost:3000/api/orders/batch",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"orders\": [\n    {\n      \"nursingHomeId\": 1,\n      \"patientId\": 1,\n      \"items\": [{\"medicationId\": 1, \"quantity\": 2}]\n    },\n    {\n      \"nursingHomeId\": 1,\n      \"patientId\": 2,\n      \"items\": [{\"medicationId\": 2, \"quantity\": 1}]\n    }\n  ]\n}",
+                "form": []
+            },
+            "tests": [],
+            "containerId": "orders-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "get-order",
+            "name": "Get Order Status",
+            "url": "http://localhost:3000/api/orders/1",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [],
+            "tests": [],
+            "containerId": "orders-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "update-order-status",
+            "name": "Update Order Status",
+            "url": "http://localhost:3000/api/orders/1/status",
+            "method": "PUT",
+            "sortNum": 60000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"status\": \"PROCESSING\"\n}",
+                "form": []
+            },
+            "tests": [],
+            "containerId": "orders-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "cancel-order",
+            "name": "Cancel Order",
+            "url": "http://localhost:3000/api/orders/1/cancel",
+            "method": "PUT",
+            "sortNum": 70000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [],
+            "tests": [],
+            "containerId": "orders-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "patient-history",
+            "name": "Patient Order History",
+            "url": "http://localhost:3000/api/history/patient/1",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [
+                {
+                    "name": "startDate",
+                    "value": "2024-01-01",
+                    "isDisabled": true
+                },
+                {
+                    "name": "endDate",
+                    "value": "2026-12-31",
+                    "isDisabled": true
+                }
+            ],
+            "tests": [],
+            "containerId": "history-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "nursing-home-history",
+            "name": "Nursing Home History",
+            "url": "http://localhost:3000/api/history/nursing-home/1",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [
+                {
+                    "name": "startDate",
+                    "value": "2024-01-01",
+                    "isDisabled": true
+                },
+                {
+                    "name": "endDate",
+                    "value": "2026-12-31",
+                    "isDisabled": true
+                }
+            ],
+            "tests": [],
+            "containerId": "history-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "medication-history",
+            "name": "Medication History",
+            "url": "http://localhost:3000/api/history/medication/1",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [
+                {
+                    "name": "startDate",
+                    "value": "2024-01-01",
+                    "isDisabled": true
+                },
+                {
+                    "name": "endDate",
+                    "value": "2026-12-31",
+                    "isDisabled": true
+                }
+            ],
+            "tests": [],
+            "containerId": "history-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "order-invoice",
+            "name": "Get Order Invoice",
+            "url": "http://localhost:3000/api/invoices/1",
+            "method": "GET",
+            "sortNum": 110000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [],
+            "tests": [],
+            "containerId": "invoices-folder",
+            "colId": "pharmacy-api-collection"
+        },
+        {
+            "id": "nursing-home-invoices",
+            "name": "Get Nursing Home Invoices",
+            "url": "http://localhost:3000/api/invoices/nursing-home/1",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2026-01-20T13:45:35.000Z",
+            "modified": "2026-01-20T13:45:35.000Z",
+            "headers": [
+                {
+                    "name": "x-api-key",
+                    "value": "NH001-abc123def456ghi789"
+                }
+            ],
+            "params": [
+                {
+                    "name": "status",
+                    "value": "RECEIVED",
+                    "isDisabled": true
+                },
+                {
+                    "name": "startDate",
+                    "value": "2024-01-01",
+                    "isDisabled": true
+                },
+                {
+                    "name": "endDate",
+                    "value": "2026-12-31",
+                    "isDisabled": true
+                }
+            ],
+            "tests": [],
+            "containerId": "invoices-folder",
+            "colId": "pharmacy-api-collection"
+        }
+    ]
+}

@@ -1,0 +1,347 @@
+{
+    "info": {
+        "name": "Pharmacy API Tests",
+        "description": "Test collection for the Pharmacy REST API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/health",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "health"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "API Info",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Create Single Order",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"nursingHomeId\": 1,\n  \"patientId\": 1,\n  \"items\": [\n    {\n      \"medicationId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"medicationId\": 3,\n      \"quantity\": 1\n    }\n  ]\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/orders",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "orders"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Create Batch Orders",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"orders\": [\n    {\n      \"nursingHomeId\": 1,\n      \"patientId\": 1,\n      \"items\": [{\"medicationId\": 1, \"quantity\": 2}]\n    },\n    {\n      \"nursingHomeId\": 1,\n      \"patientId\": 2,\n      \"items\": [{\"medicationId\": 2, \"quantity\": 1}]\n    }\n  ]\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/orders/batch",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "orders",
+                        "batch"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Order Status",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/orders/1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "orders",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Cancel Order",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/orders/1/cancel",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "orders",
+                        "1",
+                        "cancel"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Update Order Status",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"status\": \"PROCESSING\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/orders/1/status",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "orders",
+                        "1",
+                        "status"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Patient History",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/history/patient/1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "history",
+                        "patient",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Nursing Home History",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/history/nursing-home/1?startDate=2024-01-01&endDate=2024-12-31",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "history",
+                        "nursing-home",
+                        "1"
+                    ],
+                    "query": [
+                        {
+                            "key": "startDate",
+                            "value": "2024-01-01"
+                        },
+                        {
+                            "key": "endDate",
+                            "value": "2024-12-31"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Medication History",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/history/medication/1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "history",
+                        "medication",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Order Invoice",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/invoices/1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "invoices",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Nursing Home Invoices",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "YOUR_API_KEY_HERE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:3000/api/invoices/nursing-home/1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "invoices",
+                        "nursing-home",
+                        "1"
+                    ]
+                }
+            }
+        }
+    ]
+}
