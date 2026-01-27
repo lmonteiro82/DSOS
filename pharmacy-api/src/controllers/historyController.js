@@ -6,10 +6,22 @@ const { Op } = require('sequelize');
  */
 const getPatientHistory = async (req, res, next) => {
     try {
-        const { patientId } = req.params;
+        const { patientNumber } = req.params;
         const { startDate, endDate } = req.query;
 
-        const whereClause = { patientId };
+        // Find patient by patient_number
+        const patient = await Patient.findOne({
+            where: { patient_number: patientNumber }
+        });
+
+        if (!patient) {
+            return res.status(404).json({
+                success: false,
+                error: `Patient with number ${patientNumber} not found`
+            });
+        }
+
+        const whereClause = { patientId: patient.id };
 
         // Add date filtering if provided
         if (startDate || endDate) {
@@ -40,6 +52,8 @@ const getPatientHistory = async (req, res, next) => {
 
         res.json({
             success: true,
+            patientNumber,
+            patientName: patient.name,
             count: orders.length,
             totalAmount: totalAmount.toFixed(2),
             dateRange: {

@@ -3,25 +3,19 @@ const router = express.Router();
 const historyController = require('../controllers/historyController');
 const { authenticateApiKey } = require('../middleware/auth');
 const { validate } = require('../middleware/validation');
-const { entityIdValidation, dateRangeValidation } = require('../validators/orderValidators');
+const { param } = require('express-validator');
+const { dateRangeValidation } = require('../validators/orderValidators');
 
 /**
- * @route   GET /api/history/patient/:patientId
+ * @route   GET /api/history/patient/:patientNumber
  * @desc    Get patient order history with optional date range
  * @access  Private (API Key)
  */
 router.get(
-    '/patient/:patientId',
+    '/patient/:patientNumber',
     authenticateApiKey,
     [
-        ...entityIdValidation.map(v => {
-            // Change param name from 'id' to 'patientId'
-            const newValidator = v;
-            if (newValidator.builder && newValidator.builder.fields) {
-                newValidator.builder.fields = ['patientId'];
-            }
-            return newValidator;
-        }),
+        param('patientNumber').notEmpty().withMessage('Patient number is required'),
         ...dateRangeValidation
     ],
     validate,
@@ -37,13 +31,7 @@ router.get(
     '/nursing-home/:nursingHomeId',
     authenticateApiKey,
     [
-        ...entityIdValidation.map(v => {
-            const newValidator = v;
-            if (newValidator.builder && newValidator.builder.fields) {
-                newValidator.builder.fields = ['nursingHomeId'];
-            }
-            return newValidator;
-        }),
+        param('nursingHomeId').isInt({ min: 1 }).withMessage('Valid nursing home ID is required'),
         ...dateRangeValidation
     ],
     validate,
@@ -59,13 +47,7 @@ router.get(
     '/medication/:medicationId',
     authenticateApiKey,
     [
-        ...entityIdValidation.map(v => {
-            const newValidator = v;
-            if (newValidator.builder && newValidator.builder.fields) {
-                newValidator.builder.fields = ['medicationId'];
-            }
-            return newValidator;
-        }),
+        param('medicationId').isInt({ min: 1 }).withMessage('Valid medication ID is required'),
         ...dateRangeValidation
     ],
     validate,
