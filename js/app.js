@@ -4,16 +4,16 @@ let currentPage = 'dashboard';
 function initApp() {
     updateUserInfo();
     setupNavigation();
-    
+
     // Check if there's a hash in the URL
     const hash = window.location.hash.substring(1); // Remove the #
     // Remove query parameters from hash if present (e.g., #utentes?success=updated)
     const page = (hash.split('?')[0]) || 'dashboard';
-    
+
     console.log('initApp - Full URL:', window.location.href);
     console.log('initApp - Hash:', hash);
     console.log('initApp - Page to load:', page);
-    
+
     // Update active nav item
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(nav => {
@@ -23,13 +23,13 @@ function initApp() {
             nav.classList.remove('active');
         }
     });
-    
+
     loadPage(page);
 }
 
 function updateUserInfo() {
     const user = Auth.currentUser;
-    
+
     if (user) {
         document.getElementById('userName').textContent = user.nome;
         document.getElementById('userRole').textContent = getRoleLabel(user.role);
@@ -41,11 +41,11 @@ function updateUserInfo() {
         const navMedicamentos = document.querySelector('[data-page="medicamentos"]');
         const navTerapeuticas = document.querySelector('[data-page="terapeuticas"]');
         const navUsers = document.getElementById('navUsers');
-        
+
         if (navLares) {
             navLares.style.display = Auth.isAdminGeral() ? 'flex' : 'none';
         }
-        
+
         // Técnicos não veem Utilizadores, Utentes, Medicamentos e Terapêuticas
         if (Auth.isTecnico()) {
             if (navUtentes) navUtentes.style.display = 'none';
@@ -58,37 +58,34 @@ function updateUserInfo() {
 
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
-    
+
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             const page = item.getAttribute('data-page');
-            
+
             // Only handle navigation for items with data-page attribute
             // Let other links (like stocks.php) navigate normally
             if (!page) {
                 return;
             }
-            
+
             e.preventDefault();
-            
+
             // Update active state
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
-            
-            // Update URL hash
+
+            // Update URL hash - this will trigger hashchange event which loads the page
             window.location.hash = page;
-            
-            // Load page
-            loadPage(page);
         });
     });
-    
+
     // Listen for hash changes (e.g., browser back/forward)
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash.substring(1);
         // Remove query parameters from hash if present
         const page = (hash.split('?')[0]) || 'dashboard';
-        
+
         // Update active nav item
         navItems.forEach(nav => {
             if (nav.getAttribute('data-page') === page) {
@@ -97,7 +94,7 @@ function setupNavigation() {
                 nav.classList.remove('active');
             }
         });
-        
+
         loadPage(page);
     });
 }
@@ -106,13 +103,13 @@ async function loadPage(page) {
     console.log('loadPage called with:', page);
     currentPage = page;
     const pageContent = document.getElementById('pageContent');
-    
+
     // Redirect to stocks.php if trying to load stocks
     if (page === 'stocks') {
         window.location.href = 'stocks.php';
         return;
     }
-    
+
     // Check permissions
     if (!canAccessPage(page)) {
         pageContent.innerHTML = `
@@ -123,7 +120,7 @@ async function loadPage(page) {
         `;
         return;
     }
-    
+
     pageContent.innerHTML = showLoading();
 
     try {
@@ -149,16 +146,25 @@ async function loadPage(page) {
             case 'administracoes':
                 await loadAdministracoes();
                 break;
+            case 'pharmacy-orders':
+                await loadPharmacyOrders();
+                break;
+            case 'pharmacy-history':
+                await loadPharmacyHistory();
+                break;
+            case 'pharmacy-nursing-homes':
+                await loadPharmacyNursingHomes();
+                break;
             default:
                 pageContent.innerHTML = '<h1>Página não encontrada</h1>';
         }
-        
+
         // GLOBAL: Remove all onclick attributes and attach proper handlers
         setTimeout(() => {
             document.querySelectorAll('[onclick]').forEach(el => {
                 const onclickAttr = el.getAttribute('onclick');
                 console.warn('Found onclick on:', el, 'Value:', onclickAttr);
-                
+
                 // Extract function name and try to attach properly
                 if (onclickAttr) {
                     try {
@@ -170,7 +176,7 @@ async function loadPage(page) {
                         console.error('Failed to convert onclick:', e);
                     }
                 }
-                
+
                 // Remove the onclick attribute
                 el.removeAttribute('onclick');
             });
@@ -194,16 +200,16 @@ function reloadCurrentPage() {
 function canAccessPage(page) {
     // Admin Global tem acesso a tudo
     if (Auth.isAdminGeral()) return true;
-    
+
     // Admin de Lar não tem acesso a lares
     if (Auth.isAdmin()) {
         return page !== 'lares';
     }
-    
+
     // Técnico só tem acesso a dashboard e administrações (stocks é PHP separado)
     if (Auth.isTecnico()) {
         return page === 'dashboard' || page === 'administracoes';
     }
-    
+
     return false;
 }
