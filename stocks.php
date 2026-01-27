@@ -165,6 +165,26 @@ function getTipoTomaLabel($toma) {
                     <span>Terapêuticas</span>
                 </a>
                 <?php endif; ?>
+
+                <a href="app.html#pharmacy-orders" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Criar Encomenda</span>
+                </a>
+                <a href="app.html#pharmacy-history" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Histórico Encomendas</span>
+                </a>
+                <a href="app.html#pharmacy-nursing-homes" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-4h8v4" />
+                    </svg>
+                    <span>Histórico por Lar</span>
+                </a>
+
                 <?php if ($user['role'] !== 'tecnico'): ?>
                 <a href="users.php" class="nav-item" id="navUsers">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">

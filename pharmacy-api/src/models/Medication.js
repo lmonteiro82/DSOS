@@ -9,32 +9,64 @@ const Medication = sequelize.define('Medication', {
     },
     name: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: false,
+        field: 'nome'
     },
     description: {
-        type: DataTypes.TEXT,
-        allowNull: true
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        field: 'principio_ativo'
     },
     activeIngredient: {
         type: DataTypes.STRING(255),
         allowNull: true,
-        field: 'active_ingredient'
+        field: 'principio_ativo'
     },
+    marca: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        field: 'marca'
+    },
+    dose: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+        field: 'dose'
+    },
+    // Price and stock are hardcoded defaults since they don't exist in DSOS table
     price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        defaultValue: 0.00
+        type: DataTypes.VIRTUAL,
+        get() {
+            return 10.00; // Default price
+        }
     },
     stock: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return 999; // Always in stock
+        }
+    },
+    nursingHomeId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 0
+        field: 'lar_id'
+    },
+    active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: true,
+        field: 'ativo'
+    },
+    minStock: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        field: 'minimo'
     }
 }, {
-    tableName: 'medications',
+    tableName: 'medicamentos',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: false
+    updatedAt: 'updated_at'
 });
 
 module.exports = Medication;

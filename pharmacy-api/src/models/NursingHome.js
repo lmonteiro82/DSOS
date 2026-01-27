@@ -9,15 +9,18 @@ const NursingHome = sequelize.define('NursingHome', {
     },
     name: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: false,
+        field: 'nome'
     },
     address: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
+        field: 'morada'
     },
     phone: {
         type: DataTypes.STRING(50),
-        allowNull: true
+        allowNull: true,
+        field: 'telefone'
     },
     email: {
         type: DataTypes.STRING(255),
@@ -28,15 +31,12 @@ const NursingHome = sequelize.define('NursingHome', {
     },
     apiKey: {
         type: DataTypes.STRING(255),
-        allowNull: false,
-        unique: true,
+        allowNull: true,
         field: 'api_key'
     }
 }, {
-    tableName: 'nursing_homes',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: false
+    tableName: 'lares',
+    timestamps: false
 });
 
 module.exports = NursingHome;

@@ -10,26 +10,25 @@ const Patient = sequelize.define('Patient', {
     nursingHomeId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        field: 'nursing_home_id',
+        field: 'lar_id',
         references: {
-            model: 'nursing_homes',
+            model: 'lares',
             key: 'id'
         }
     },
     patientNumber: {
         type: DataTypes.STRING(100),
         allowNull: true,
-        field: 'patient_number'
+        field: 'numero_utente'
     },
     name: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: false,
+        field: 'nome'
     }
 }, {
-    tableName: 'patients',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: false
+    tableName: 'utentes',
+    timestamps: false
 });
 
 module.exports = Patient;

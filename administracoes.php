@@ -93,7 +93,8 @@ if ($user['role'] === 'admin_geral') {
 $stmt->execute();
 $terapeuticas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-function getTipoTomaLabel($tipo) {
+function getTipoTomaLabel($tipo)
+{
     $labels = [
         'oral' => 'Oral',
         'injetavel' => 'Injetável',
@@ -108,7 +109,8 @@ function getTipoTomaLabel($tipo) {
     return $labels[$tipo] ?? $tipo;
 }
 
-function getTipoTerapeuticaLabel($tipo) {
+function getTipoTerapeuticaLabel($tipo)
+{
     $labels = [
         'continua' => 'Contínua',
         'temporaria' => 'Temporária',
@@ -117,7 +119,8 @@ function getTipoTerapeuticaLabel($tipo) {
     return $labels[$tipo] ?? $tipo;
 }
 
-function getTipoTerapeuticaBadge($tipo) {
+function getTipoTerapeuticaBadge($tipo)
+{
     $badges = [
         'continua' => 'primary',
         'temporaria' => 'warning',
@@ -128,100 +131,124 @@ function getTipoTerapeuticaBadge($tipo) {
 ?>
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrações - Rodas & Bengalas</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div id="mainApp">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                 </svg>
                 <h2>R&B</h2>
             </div>
             <nav class="sidebar-nav">
                 <a href="app.html" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="3" y="3" width="7" height="7"/>
-                        <rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/>
-                        <rect x="3" y="14" width="7" height="7"/>
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
                     </svg>
                     <span>Dashboard</span>
                 </a>
                 <?php if ($user['role'] === 'admin_geral'): ?>
-                <a href="app.html#lares" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                    <span>Lares</span>
-                </a>
+                    <a href="app.html#lares" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                        <span>Lares</span>
+                    </a>
                 <?php endif; ?>
                 <?php if ($user['role'] !== 'tecnico'): ?>
-                <a href="app.html#utentes" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    <span>Utentes</span>
-                </a>
-                <a href="app.html#medicamentos" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
-                        <rect x="9" y="9" width="6" height="6"/>
-                        <line x1="9" y1="1" x2="9" y2="4"/>
-                        <line x1="15" y1="1" x2="15" y2="4"/>
-                        <line x1="9" y1="20" x2="9" y2="23"/>
-                        <line x1="15" y1="20" x2="15" y2="23"/>
-                        <line x1="20" y1="9" x2="23" y2="9"/>
-                        <line x1="20" y1="14" x2="23" y2="14"/>
-                        <line x1="1" y1="9" x2="4" y2="9"/>
-                        <line x1="1" y1="14" x2="4" y2="14"/>
-                    </svg>
-                    <span>Medicamentos</span>
-                </a>
-                <a href="app.html#terapeuticas" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    <span>Terapêuticas</span>
-                </a>
+                    <a href="app.html#utentes" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>Utentes</span>
+                    </a>
+                    <a href="app.html#medicamentos" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+                            <rect x="9" y="9" width="6" height="6" />
+                            <line x1="9" y1="1" x2="9" y2="4" />
+                            <line x1="15" y1="1" x2="15" y2="4" />
+                            <line x1="9" y1="20" x2="9" y2="23" />
+                            <line x1="15" y1="20" x2="15" y2="23" />
+                            <line x1="20" y1="9" x2="23" y2="9" />
+                            <line x1="20" y1="14" x2="23" y2="14" />
+                            <line x1="1" y1="9" x2="4" y2="9" />
+                            <line x1="1" y1="14" x2="4" y2="14" />
+                        </svg>
+                        <span>Medicamentos</span>
+                    </a>
+                    <a href="app.html#terapeuticas" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span>Terapêuticas</span>
+                    </a>
                 <?php endif; ?>
-                <?php if ($user['role'] !== 'tecnico'): ?>
-                <a href="users.php" class="nav-item">
+
+                <a href="app.html#pharmacy-orders" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="8.5" cy="7" r="4"/>
-                        <polyline points="17 11 19 13 23 9"/>
+                        <path
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <span>Utilizadores</span>
+                    <span>Criar Encomenda</span>
                 </a>
+                <a href="app.html#pharmacy-history" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Histórico Encomendas</span>
+                </a>
+                <a href="app.html#pharmacy-nursing-homes" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-4h8v4" />
+                    </svg>
+                    <span>Histórico por Lar</span>
+                </a>
+
+                <?php if ($user['role'] !== 'tecnico'): ?>
+                    <a href="users.php" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <polyline points="17 11 19 13 23 9" />
+                        </svg>
+                        <span>Utilizadores</span>
+                    </a>
                 <?php endif; ?>
                 <a href="stocks.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        <line x1="12" y1="22.08" x2="12" y2="12" />
                     </svg>
                     <span>Stocks</span>
                 </a>
                 <a href="administracoes.php" class="nav-item active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
                     </svg>
                     <span>Administrações</span>
                 </a>
@@ -236,9 +263,9 @@ function getTipoTerapeuticaBadge($tipo) {
                 </div>
                 <a href="logout.php" class="btn-logout">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                 </a>
             </div>
@@ -253,7 +280,10 @@ function getTipoTerapeuticaBadge($tipo) {
                         <p class="page-subtitle">Registo e validação de administrações</p>
                     </div>
                     <button class="btn btn-primary" onclick="showRegistarModal()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
                         Registar Administração
                     </button>
                 </div>
@@ -276,9 +306,9 @@ function getTipoTerapeuticaBadge($tipo) {
                     <?php if (empty($administracoes)): ?>
                         <div class="empty-state">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="8" x2="12" y2="12"/>
-                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
                             </svg>
                             <h3>Nenhuma administração encontrada</h3>
                             <p>Comece por registar a primeira administração</p>
@@ -308,12 +338,15 @@ function getTipoTerapeuticaBadge($tipo) {
                                             <td><strong><?= htmlspecialchars($a['utente_nome']) ?></strong></td>
                                             <td>
                                                 <?= htmlspecialchars($a['medicamento_nome']) ?><br>
-                                                <small><?= htmlspecialchars($a['dose']) ?> - <?= getTipoTomaLabel($a['toma']) ?></small>
+                                                <small><?= htmlspecialchars($a['dose']) ?> -
+                                                    <?= getTipoTomaLabel($a['toma']) ?></small>
                                             </td>
                                             <?php if ($user['role'] === 'admin_geral'): ?>
                                                 <td><?= htmlspecialchars($a['lar_nome'] ?? '-') ?></td>
                                             <?php endif; ?>
-                                            <td><span class="badge badge-<?= getTipoTerapeuticaBadge($a['terapeutica_tipo']) ?>"><?= getTipoTerapeuticaLabel($a['terapeutica_tipo']) ?></span></td>
+                                            <td><span
+                                                    class="badge badge-<?= getTipoTerapeuticaBadge($a['terapeutica_tipo']) ?>"><?= getTipoTerapeuticaLabel($a['terapeutica_tipo']) ?></span>
+                                            </td>
                                             <td>
                                                 <?php if ($a['administrada']): ?>
                                                     <span class="badge badge-success">Sim</span>
@@ -336,11 +369,14 @@ function getTipoTerapeuticaBadge($tipo) {
                                             </td>
                                             <td>
                                                 <?php if (!$a['validada']): ?>
-                                                    <form method="POST" action="validar_administracao_action.php" style="display: inline;">
+                                                    <form method="POST" action="validar_administracao_action.php"
+                                                        style="display: inline;">
                                                         <input type="hidden" name="id" value="<?= $a['id'] ?>">
-                                                        <button type="submit" class="btn" style="background: #10b981; color: white; padding: 6px 12px; font-size: 14px; border: none;">
-                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 16px; height: 16px; margin-right: 4px;">
-                                                                <polyline points="20 6 9 17 4 12"/>
+                                                        <button type="submit" class="btn"
+                                                            style="background: #10b981; color: white; padding: 6px 12px; font-size: 14px; border: none;">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                style="width: 16px; height: 16px; margin-right: 4px;">
+                                                                <polyline points="20 6 9 17 4 12" />
                                                             </svg>
                                                             Validar
                                                         </button>
@@ -357,18 +393,18 @@ function getTipoTerapeuticaBadge($tipo) {
             </div>
         </main>
     </div>
-    
+
     <!-- Modal Container -->
     <div id="modalContainer"></div>
-    
+
     <script src="js/utils.js"></script>
     <script>
         const terapeuticas = <?= json_encode($terapeuticas) ?>;
         const isAdminGeral = <?= json_encode($user['role'] === 'admin_geral') ?>;
-        
+
         function showRegistarModal() {
             let terapeuticasOptions = '';
-            
+
             if (isAdminGeral) {
                 // Agrupar por lar
                 const porLar = {};
@@ -377,7 +413,7 @@ function getTipoTerapeuticaBadge($tipo) {
                     if (!porLar[lar]) porLar[lar] = [];
                     porLar[lar].push(t);
                 });
-                
+
                 Object.keys(porLar).sort().forEach(lar => {
                     terapeuticasOptions += `<optgroup label="${lar}">`;
                     porLar[lar].forEach(t => {
@@ -390,10 +426,10 @@ function getTipoTerapeuticaBadge($tipo) {
                     terapeuticasOptions += `<option value="${t.id}">${t.utente_nome} - ${t.medicamento_nome} (${t.dose})</option>`;
                 });
             }
-            
+
             const now = new Date();
             const dataHoraDefault = now.toISOString().slice(0, 16);
-            
+
             const content = `
                 <form method="POST" action="registar_administracao_action.php">
                     <div class="form-group">
@@ -428,15 +464,15 @@ function getTipoTerapeuticaBadge($tipo) {
                     </div>
                 </form>
             `;
-            
+
             showModal('Registar Administração', content, '');
         }
-        
+
         function toggleMotivo() {
             const check = document.getElementById('checkAdministrada');
             const motivoGroup = document.getElementById('motivoGroup');
             const motivoTextarea = document.getElementById('motivoTextarea');
-            
+
             if (check.checked) {
                 motivoGroup.style.display = 'none';
                 motivoTextarea.required = false;
@@ -447,4 +483,5 @@ function getTipoTerapeuticaBadge($tipo) {
         }
     </script>
 </body>
+
 </html>

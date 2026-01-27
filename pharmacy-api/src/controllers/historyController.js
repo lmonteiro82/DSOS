@@ -9,15 +9,20 @@ const getPatientHistory = async (req, res, next) => {
         const { patientNumber } = req.params;
         const { startDate, endDate } = req.query;
 
-        // Find patient by patient_number
+        // Find patient by ID or numero_utente
         const patient = await Patient.findOne({
-            where: { patient_number: patientNumber }
+            where: {
+                [Op.or]: [
+                    { id: patientNumber },
+                    { numero_utente: patientNumber }
+                ]
+            }
         });
 
         if (!patient) {
             return res.status(404).json({
                 success: false,
-                error: `Patient with number ${patientNumber} not found`
+                error: `Patient with ID/number ${patientNumber} not found`
             });
         }
 
